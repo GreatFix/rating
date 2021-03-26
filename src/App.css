@@ -1,0 +1,11 @@
+html,
+body {
+  overflow: hidden;
+}
+
+::-webkit-scrollbar {
+  width: 0;
+}
+.Overflow {
+  overflow: auto;
+}

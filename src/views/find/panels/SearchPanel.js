@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
   Panel,
   PanelHeader,
@@ -6,24 +6,78 @@ import {
   Group,
   FormItem,
   SliderSwitch,
-  RichCell,
-  Avatar,
-  Counter,
   Placeholder,
   ScreenSpinner,
+  List,
+  Button,
 } from '@vkontakte/vkui';
-
+import {
+  Icon56UsersOutline,
+  Icon56ErrorTriangleOutline,
+  Icon56Users3Outline,
+} from '@vkontakte/icons';
 import Search from '../components/Search/Search';
-
+import { useDebounce } from 'use-lodash-debounce';
 import User from '../../../store/user';
 import DetailsUser from '../../../store/detailsUser';
+import DetailsGroup from '../../../store/detailsGroup';
 import { observer } from 'mobx-react-lite';
+import UserCell from '../components/UserCell/UserCell';
+import GroupCell from '../components/GroupCell/GroupCell';
 
 const SearchResult = observer(({ id, go }) => {
   const [searchSwitch, setSearchSwitch] = useState('users');
-  console.log(searchSwitch);
+  const offset = useRef(0);
+  const scrollHeight = useRef(0);
+
+  const [text, setText] = useState('');
+  const [filters, setFilters] = useState({});
+  const deferredText = useDebounce(text, 500);
+
+  useEffect(() => {
+    offset.current = 0;
+    if (searchSwitch === 'users') {
+      User.searchUsers(deferredText, filters);
+    } else if (searchSwitch === 'groups' && deferredText) {
+      User.searchGroups(deferredText, filters);
+    }
+  }, [deferredText, filters, searchSwitch]);
+
+  const onScroll = (e) => {
+    if (
+      e.target.offsetHeight + e.target.scrollTop + 10 >= e.target.scrollHeight &&
+      scrollHeight.current !== e.target.scrollHeight
+    ) {
+      scrollHeight.current = e.target.scrollHeight;
+      offset.current = offset.current + 20;
+      if (searchSwitch === 'users') {
+        User.searchUsers(deferredText, filters, offset.current);
+      } else if (searchSwitch === 'groups') {
+        User.searchGroups(deferredText, filters, offset.current);
+      }
+    }
+  };
+
+  const onClickUser = useCallback(
+    (user) => {
+      DetailsUser.setId(user.id);
+      DetailsUser.getInfo(User.token);
+      go('detailsUser');
+    },
+    [go]
+  );
+
+  const onClickGroup = useCallback(
+    (group) => {
+      DetailsGroup.setId(group.id);
+      DetailsGroup.getInfo(User.token);
+      go('detailsGroup');
+    },
+    [go]
+  );
+
   return (
-    <Panel id={id}>
+    <Panel id={id} className="Overflow" onScroll={onScroll}>
       <PanelHeader
         left={
           <PanelHeaderBack
@@ -35,7 +89,13 @@ const SearchResult = observer(({ id, go }) => {
       >
         Поиск
       </PanelHeader>
-      <Search focus={true} searchSwitch={searchSwitch} />
+      <Search
+        focus={true}
+        searchSwitch={searchSwitch}
+        text={text}
+        setText={setText}
+        setFilters={setFilters}
+      />
       <Group>
         <FormItem>
           <SliderSwitch
@@ -58,77 +118,50 @@ const SearchResult = observer(({ id, go }) => {
       </Group>
       {searchSwitch === 'users' ? (
         <Group>
-          {User.searchedUsers.fetched ? (
-            User.searchedUsers.list.length > 0 ? (
-              User.searchedUsers.list.map((user) => (
-                <RichCell
-                  key={Math.random()}
-                  before={<Avatar size={48} src={user.photo_50} />}
-                  text={user.activities}
-                  caption={user.city && user.city.title ? user.city.title : ''}
-                  multiline={true}
-                  after={
-                    <div className="UserReviews">
-                      <Counter size="s" className="UserReviewsCounterPositive">
-                        3
-                      </Counter>
-                      <Counter size="s" mode="prominent">
-                        3
-                      </Counter>
-                    </div>
-                  }
-                  onClick={() => {
-                    DetailsUser.setId(user.id);
-                    DetailsUser.getInfo(User.token);
-                    go('details');
-                  }}
-                >
-                  {`${user.first_name} ${user.last_name}`}
-                </RichCell>
-              ))
+          <List>
+            {User.searchedUsers.fetched ? (
+              User.searchedUsers.list.length > 0 ? (
+                User.searchedUsers.list.map((user) => (
+                  <UserCell key={user.id} user={user} onClick={onClickUser} />
+                ))
+              ) : (
+                <Placeholder icon={<Icon56UsersOutline />}>Люди</Placeholder>
+              )
+            ) : !User.token ? (
+              <Placeholder
+                icon={<Icon56ErrorTriangleOutline />}
+                action={
+                  <Button
+                    onClick={() => {
+                      User.getToken();
+                    }}
+                    size="m"
+                  >
+                    Дать доступ
+                  </Button>
+                }
+              >
+                Доступ запрещен
+              </Placeholder>
             ) : (
-              <Placeholder>Люди</Placeholder>
-            )
-          ) : User.tokenFG.permission === 'denied' ? (
-            <Placeholder>Отказано в доступе</Placeholder>
-          ) : (
-            <ScreenSpinner />
-          )}
+              <ScreenSpinner />
+            )}
+          </List>
         </Group>
       ) : (
         <Group>
           {User.searchedGroups.fetched ? (
             User.searchedGroups.list.length > 0 ? (
               User.searchedGroups.list.map((group) => (
-                <RichCell
-                  key={Math.random()}
-                  before={<Avatar size={48} src={group.photo_50} />}
-                  //text={group.city && group.city.title ? group.city.title : ''}
-                  caption={
-                    group.type === 'page'
-                      ? `${group.members_count} подписчиков`
-                      : `${group.members_count} участников`
-                  }
-                  multiline={true}
-                  after={
-                    <div className="GroupReviews">
-                      <Counter size="s" className="GroupReviewsCounterPositive">
-                        3
-                      </Counter>
-                      <Counter size="s" mode="prominent">
-                        3
-                      </Counter>
-                    </div>
-                  }
-                >
-                  {`${group.name}`}
-                </RichCell>
+                <GroupCell key={group.id} group={group} onClick={onClickGroup} />
               ))
             ) : (
-              <Placeholder>Сообщества</Placeholder>
+              <Placeholder>
+                <Icon56Users3Outline />
+              </Placeholder>
             )
-          ) : User.tokenFG.permission === 'denied' ? (
-            <Placeholder>Отказано в доступе</Placeholder>
+          ) : !deferredText ? (
+            <Placeholder icon={<Icon56Users3Outline />}>Сообщества</Placeholder>
           ) : (
             <ScreenSpinner />
           )}

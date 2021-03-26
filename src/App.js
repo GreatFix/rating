@@ -5,11 +5,13 @@ import { AdaptivityProvider, AppRoot } from '@vkontakte/vkui';
 import '@vkontakte/vkui/dist/vkui.css';
 import { Icon20Search, Icon24Chats, Icon24UserOutline } from '@vkontakte/icons';
 
-import Find from './views/find//Find';
+import Find from './views/find/Find';
 import Reviews from './views/reviews/Reviews';
 import Profile from './views/profile/Profile';
 import User from './store/user';
 import { observer } from 'mobx-react-lite';
+
+import './App.css';
 
 const App = observer(() => {
   const [activeStory, setActiveStory] = useState('find');

@@ -1,10 +1,7 @@
 import React from 'react';
-
 import { Caption, Group, PanelHeader, PanelHeaderBack, Panel } from '@vkontakte/vkui';
-
 import { observer } from 'mobx-react-lite';
-import DetailsUser from '../../../store/detailsUser';
-import User from '../../../store/user';
+import DetailsGroup from '../../../store/detailsGroup';
 
 const Details = observer(({ id, go }) => {
   return (
@@ -14,7 +11,7 @@ const Details = observer(({ id, go }) => {
           <PanelHeaderBack
             onClick={() => {
               go('main');
-              DetailsUser.infoClear();
+              DetailsGroup.infoClear();
             }}
           />
         }
@@ -22,7 +19,7 @@ const Details = observer(({ id, go }) => {
         Подробности
       </PanelHeader>
       <Group>
-        <Caption>{DetailsUser.info && DetailsUser.info.first_name}</Caption>
+        <Caption>{DetailsGroup.info && DetailsGroup.info.first_name}</Caption>
       </Group>
     </Panel>
   );

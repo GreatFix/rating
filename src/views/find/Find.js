@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { View } from '@vkontakte/vkui';
 import Main from './panels/Main';
-import Details from './panels/Details';
+import DetailsUser from './panels/DetailsUser';
+import DetailsGroup from './panels/DetailsGroup';
 import SearchPanel from './panels/SearchPanel';
 import { observer } from 'mobx-react-lite';
 
@@ -10,10 +11,15 @@ const Find = observer((props) => {
 
   const go = (panelName) => setActivePanel(panelName);
 
+  const onScroll = (e) => {
+    console.log(e.target.offsetHeight);
+  };
+
   return (
-    <View id="find" activePanel={activePanel}>
+    <View id="find" activePanel={activePanel} onScroll={onScroll}>
       <Main id="main" go={go} />
-      <Details id="details" go={go} />
+      <DetailsUser id="detailsUser" go={go} />
+      <DetailsGroup id="detailsGroup" go={go} />
       <SearchPanel id="searchPanel" go={go} />
     </View>
   );

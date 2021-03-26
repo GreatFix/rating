@@ -18,6 +18,11 @@ class User {
     makeAutoObservable(this);
   }
 
+  clearFetchedInfo() {
+    this.friends = { fetched: false, list: [] };
+    this.groups = { fetched: false, list: [] };
+  }
+
   getUserInfo() {
     bridge
       .send('VKWebAppGetUserInfo')
@@ -78,7 +83,7 @@ class User {
       .catch((err) => console.error(err));
   }
 
-  fetchFriends(count = 50, offset = 0) {
+  fetchFriends(offset = 0, count = 20) {
     if (this.tokenFG.token) {
       bridge
         .send('VKWebAppCallAPIMethod', {
@@ -93,16 +98,20 @@ class User {
         })
         .then((res) => {
           runInAction(() => {
-            this.friends.list = res.response.items;
-            this.friends.fetched = true;
-            console.log(res.response);
+            if (offset > 0) {
+              if (!(offset > res.response.count))
+                this.friends.list = this.friends.list.concat(res.response.items);
+            } else {
+              this.friends.list = res.response.items;
+              this.friends.fetched = true;
+            }
           });
         })
         .catch((err) => console.error(err));
     }
   }
 
-  fetchGroups(count = 20, offset = 0) {
+  fetchGroups(offset = 0, count = 20) {
     if (this.tokenFG.token) {
       bridge
         .send('VKWebAppCallAPIMethod', {
@@ -118,16 +127,20 @@ class User {
         })
         .then((res) => {
           runInAction(() => {
-            this.groups.list = res.response.items;
-            this.groups.fetched = true;
-            console.log(res.response);
+            if (offset > 0) {
+              if (!(offset > res.response.count))
+                this.groups.list = this.groups.list.concat(res.response.items);
+            } else {
+              this.groups.list = res.response.items;
+              this.groups.fetched = true;
+            }
           });
         })
         .catch((err) => console.error(err));
     }
   }
 
-  searchUsers(text, filters, count = 20, offset = 0) {
+  searchUsers(text, filters, offset = 0, count = 20) {
     if (this.token) {
       bridge
         .send('VKWebAppCallAPIMethod', {
@@ -144,16 +157,20 @@ class User {
         })
         .then((res) => {
           runInAction(() => {
-            this.searchedUsers.list = res.response.items;
-            this.searchedUsers.fetched = true;
-            console.log(res.response);
+            if (offset > 0) {
+              if (!(offset > res.response.count))
+                this.searchedUsers.list = this.searchedUsers.list.concat(res.response.items);
+            } else {
+              this.searchedUsers.list = res.response.items;
+              this.searchedUsers.fetched = true;
+            }
           });
         })
         .catch((err) => console.error(err));
     }
   }
 
-  searchGroups(text, filters, count = 20, offset = 0) {
+  searchGroups(text, filters, offset = 0, count = 20) {
     if (this.token) {
       bridge
         .send('VKWebAppCallAPIMethod', {
@@ -170,9 +187,13 @@ class User {
         })
         .then((res) => {
           runInAction(() => {
-            this.searchedGroups.list = res.response.items;
-            this.searchedGroups.fetched = true;
-            console.log(res.response);
+            if (offset > 0) {
+              if (!(offset > res.response.count))
+                this.searchedGroups.list = this.searchedGroups.list.concat(res.response.items);
+            } else {
+              this.searchedGroups.list = res.response.items;
+              this.searchedGroups.fetched = true;
+            }
           });
         })
         .catch((err) => console.error(err));
