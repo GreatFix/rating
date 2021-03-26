@@ -1,49 +1,85 @@
 import React, { useState, useEffect } from 'react';
 import bridge from '@vkontakte/vk-bridge';
-import View from '@vkontakte/vkui/dist/components/View/View';
-import ScreenSpinner from '@vkontakte/vkui/dist/components/ScreenSpinner/ScreenSpinner';
+import { Epic, Tabbar, TabbarItem } from '@vkontakte/vkui';
 import { AdaptivityProvider, AppRoot } from '@vkontakte/vkui';
 import '@vkontakte/vkui/dist/vkui.css';
+import { Icon20Search, Icon24Chats, Icon24UserOutline } from '@vkontakte/icons';
 
-import Home from './panels/Home';
-import Persik from './panels/Persik';
+import Find from './views/find//Find';
+import Reviews from './views/reviews/Reviews';
+import Profile from './views/profile/Profile';
+import User from './store/user';
+import { observer } from 'mobx-react-lite';
 
-const App = () => {
-	const [activePanel, setActivePanel] = useState('home');
-	const [fetchedUser, setUser] = useState(null);
-	const [popout, setPopout] = useState(<ScreenSpinner size='large' />);
+const App = observer(() => {
+  const [activeStory, setActiveStory] = useState('find');
 
-	useEffect(() => {
-		bridge.subscribe(({ detail: { type, data }}) => {
-			if (type === 'VKWebAppUpdateConfig') {
-				const schemeAttribute = document.createAttribute('scheme');
-				schemeAttribute.value = data.scheme ? data.scheme : 'client_light';
-				document.body.attributes.setNamedItem(schemeAttribute);
-			}
-		});
-		async function fetchData() {
-			const user = await bridge.send('VKWebAppGetUserInfo');
-			setUser(user);
-			setPopout(null);
-		}
-		fetchData();
-	}, []);
+  if (!User.id) {
+    User.getUserInfo();
+  }
 
-	const go = e => {
-		setActivePanel(e.currentTarget.dataset.to);
-	};
+  if (!User.token) {
+    User.getToken();
+  }
 
-	return (
-		<AdaptivityProvider>
-			<AppRoot>
-				<View activePanel={activePanel} popout={popout}>
-					<Home id='home' fetchedUser={fetchedUser} go={go} />
-					<Persik id='persik' go={go} />
-				</View>
-			</AppRoot>
-		</AdaptivityProvider>
-	);
-}
+  useEffect(() => {
+    bridge.subscribe(({ detail: { type, data } }) => {
+      if (type === 'VKWebAppUpdateConfig') {
+        const schemeAttribute = document.createAttribute('scheme');
+        schemeAttribute.value = data.scheme ? data.scheme : 'client_light';
+        document.body.attributes.setNamedItem(schemeAttribute);
+      }
+    });
+  }, []);
+
+  return (
+    <AdaptivityProvider>
+      <AppRoot>
+        <Epic
+          activeStory={activeStory}
+          tabbar={
+            <Tabbar>
+              <TabbarItem
+                onClick={() => {
+                  setActiveStory('find');
+                }}
+                selected={activeStory === 'find'}
+                data-story="find"
+                text="Найти"
+              >
+                <Icon20Search />
+              </TabbarItem>
+              <TabbarItem
+                onClick={() => {
+                  setActiveStory('reviews');
+                }}
+                selected={activeStory === 'reviews'}
+                data-story="reviews"
+                text="Отзывы"
+              >
+                <Icon24Chats />
+              </TabbarItem>
+              <TabbarItem
+                onClick={() => {
+                  setActiveStory('profile');
+                }}
+                selected={activeStory === 'profile'}
+                data-story="profile"
+                label="12"
+                text="Профиль"
+              >
+                <Icon24UserOutline />
+              </TabbarItem>
+            </Tabbar>
+          }
+        >
+          <Find id="find" activePanel="find" />
+          <Reviews id="reviews" activePanel="reviews" />
+          <Profile id="profile" activePanel="profile" />
+        </Epic>
+      </AppRoot>
+    </AdaptivityProvider>
+  );
+});
 
 export default App;
-

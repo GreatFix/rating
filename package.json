@@ -13,23 +13,43 @@
   "author": "",
   "license": "MIT",
   "devDependencies": {
-    "cross-env": "^5.2.0",
-    "react-hot-loader": "^4.9.0",
-    "react-scripts": "^4.0.1"
+    "cross-env": "^7.0.3",
+    "eslint": "^7.22.0",
+    "eslint-config-prettier": "^8.1.0",
+    "eslint-plugin-prettier": "^3.3.1",
+    "prettier": "^2.2.1",
+    "react-hot-loader": "^4.13.0",
+    "react-scripts": "^4.0.3"
   },
   "dependencies": {
-    "@vkontakte/icons": "^1.18.2",
+    "@vkontakte/icons": "^1.87.0",
     "@vkontakte/vk-bridge": "^2.4.1",
-    "@vkontakte/vk-miniapps-deploy": "0.0.17",
+    "@vkontakte/vk-miniapps-deploy": "0.0.25",
     "@vkontakte/vkjs": "^0.20.0",
-    "@vkontakte/vkui": "^4.0.4",
+    "@vkontakte/vkui": "^4.3.0",
+    "axios": "^0.21.1",
     "babel-eslint": "^10.1.0",
-    "chalk": "^2.4.2",
-    "eruda": "^2.2.0",
+    "chalk": "^4.1.0",
+    "eruda": "^2.4.1",
     "eruda-code": "^2.0.0",
     "eruda-dom": "^2.0.0",
+    "mobx": "^6.1.8",
+    "mobx-react-lite": "^3.2.0",
     "prop-types": "^15.7.2",
-    "react": "^16.9.0",
-    "react-dom": "^16.9.0"
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "use-lodash-debounce": "^1.1.0"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
   }
 }
