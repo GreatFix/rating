@@ -7,7 +7,7 @@ import {
   TabsItem,
   Group,
   Placeholder,
-  ScreenSpinner,
+  PanelSpinner,
   List,
   Button,
   Search,
@@ -32,10 +32,16 @@ const Main = observer(({ id, go }) => {
 
   useEffect(() => {
     if (!(User.tokenFG.permission === 'denied')) {
+      offset.current = 0;
       if (!User.tokenFG.token) {
-        User.getTokenFG();
+        User.getTokenFG().then((res) => {
+          if (activeTab === TAB_FRIENDS && !User.friends.fetched) {
+            User.fetchFriends();
+          } else if (activeTab === TAB_GROUPS && !User.groups.fetched) {
+            User.fetchGroups();
+          }
+        });
       } else {
-        offset.current = 0;
         if (activeTab === TAB_FRIENDS && !User.friends.fetched) {
           User.fetchFriends();
         } else if (activeTab === TAB_GROUPS && !User.groups.fetched) {
@@ -44,7 +50,7 @@ const Main = observer(({ id, go }) => {
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeTab, User.tokenFG.token]);
+  }, [activeTab]);
 
   const onScroll = (e) => {
     if (
@@ -113,7 +119,9 @@ const Main = observer(({ id, go }) => {
               User.friends.list.length > 0 ? (
                 User.friends.list.map((friend) => <UserCell key={friend.id} user={friend} onClick={onClickUser} />)
               ) : (
-                <Placeholder icon={<Icon56UsersOutline />}>Друзья</Placeholder>
+                <Placeholder header={'Друзья'} icon={<Icon56UsersOutline />}>
+                  Не найдено
+                </Placeholder>
               )
             ) : User.tokenFG.permission === 'denied' ? (
               <Placeholder
@@ -132,7 +140,7 @@ const Main = observer(({ id, go }) => {
                 Доступ запрещен
               </Placeholder>
             ) : (
-              <ScreenSpinner />
+              <PanelSpinner />
             )}
           </List>
         </Group>
@@ -143,7 +151,9 @@ const Main = observer(({ id, go }) => {
               User.groups.list.length > 0 ? (
                 User.groups.list.map((group) => <GroupCell key={group.id} group={group} onClick={onClickGroup} />)
               ) : (
-                <Placeholder icon={<Icon56Users3Outline />}>Сообщества</Placeholder>
+                <Placeholder header={'Сообщества'} icon={<Icon56Users3Outline />}>
+                  Не найдено
+                </Placeholder>
               )
             ) : User.tokenFG.permission === 'denied' ? (
               <Placeholder
@@ -162,7 +172,7 @@ const Main = observer(({ id, go }) => {
                 Доступ запрещен
               </Placeholder>
             ) : (
-              <ScreenSpinner />
+              <PanelSpinner />
             )}
           </List>
         </Group>

@@ -36,28 +36,56 @@ class User {
       .catch((err) => console.error(err));
   }
 
+  // getTokenFG() {
+  //   bridge
+  //     .send('VKWebAppGetAuthToken', {
+  //       app_id: 7799989,
+  //       scope: 'friends,groups',
+  //     })
+  //     .then((res) => {
+  //       runInAction(() => {
+  //         if ((res.access_token && !res.scope) || (res.access_token && res.scope === 'friends,groups')) {
+  //           this.tokenFG.token = res.access_token;
+  //           this.tokenFG.permission = 'allowed';
+  //         }
+  //       });
+  //     })
+  //     .catch((err) => {
+  //       runInAction(() => {
+  //         if (err.error_data.error_code === 4) {
+  //           this.tokenFG.permission = 'denied';
+  //         }
+  //         console.error(err);
+  //       });
+  //     });
+  // }
+
   getTokenFG() {
-    bridge
-      .send('VKWebAppGetAuthToken', {
-        app_id: 7799989,
-        scope: 'friends,groups',
-      })
-      .then((res) => {
-        runInAction(() => {
-          if ((res.access_token && !res.scope) || (res.access_token && res.scope === 'friends,groups')) {
-            this.tokenFG.token = res.access_token;
-            this.tokenFG.permission = 'allowed';
-          }
+    return new Promise((resolve, reject) => {
+      return bridge
+        .send('VKWebAppGetAuthToken', {
+          app_id: 7799989,
+          scope: 'friends,groups',
+        })
+        .then((res) => {
+          runInAction(() => {
+            if ((res.access_token && !res.scope) || (res.access_token && res.scope === 'friends,groups')) {
+              this.tokenFG.token = res.access_token;
+              this.tokenFG.permission = 'allowed';
+              resolve('allowed');
+            }
+          });
+        })
+        .catch((err) => {
+          runInAction(() => {
+            if (err.error_data.error_code === 4) {
+              this.tokenFG.permission = 'denied';
+            }
+            reject(err);
+            console.error(err);
+          });
         });
-      })
-      .catch((err) => {
-        runInAction(() => {
-          if (err.error_data.error_code === 4) {
-            this.tokenFG.permission = 'denied';
-          }
-          console.error(err);
-        });
-      });
+    });
   }
   getToken() {
     bridge

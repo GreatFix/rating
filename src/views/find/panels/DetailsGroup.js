@@ -3,6 +3,8 @@ import { Caption, Group, PanelHeader, PanelHeaderBack, Panel } from '@vkontakte/
 import { observer } from 'mobx-react-lite';
 import DetailsGroup from '../../../store/detailsGroup';
 
+const PANEL_MAIN = 'PANEL_MAIN';
+
 const Details = observer(({ id, go }) => {
   return (
     <Panel id={id}>
@@ -10,7 +12,7 @@ const Details = observer(({ id, go }) => {
         left={
           <PanelHeaderBack
             onClick={() => {
-              go('main');
+              go(PANEL_MAIN);
               DetailsGroup.infoClear();
             }}
           />

@@ -18,7 +18,7 @@ const PROFILE = 'PROFILE';
 const REVIEWS = 'REVIEWS';
 
 const App = observer(() => {
-  const [activeStory, setActiveStory] = useState(FIND);
+  const [activeStory, setActiveStory] = useState(PROFILE);
 
   if (!User.id) {
     User.getUserInfo();

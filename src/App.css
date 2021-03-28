@@ -7,8 +7,5 @@ body {
   width: 0;
 }
 .Overflow {
-  overflow: auto;
-}
-.List {
-  height: 50vh;
+  overflow: hidden;
 }

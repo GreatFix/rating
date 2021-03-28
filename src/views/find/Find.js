@@ -185,8 +185,9 @@ const Find = observer(({ id }) => {
             Выбор страны
           </ModalPageHeader>
         }
+        className="Overflow"
       >
-        <Group className="Overflow">
+        <Group>
           <List>
             {Filters.listCountries.length > 0 ? (
               Filters.listCountries.map((country) => (
@@ -211,8 +212,9 @@ const Find = observer(({ id }) => {
             Выбор города
           </ModalPageHeader>
         }
+        className="Overflow"
       >
-        <Group className="Overflow">
+        <Group>
           <Search value={text} onChange={(e) => setText(e.target.value)} />
           <List>
             {Filters.listCities.length > 0 ? (

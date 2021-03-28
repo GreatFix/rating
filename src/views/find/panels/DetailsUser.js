@@ -41,6 +41,8 @@ import {
   Icon28AddOutline,
 } from '@vkontakte/icons';
 
+const PANEL_MAIN = 'PANEL_MAIN';
+
 const Details = observer(({ id, go, sizeX }) => {
   const platform = usePlatform();
   const [activeModal, setActiveModal] = React.useState(null);
@@ -114,7 +116,7 @@ const Details = observer(({ id, go, sizeX }) => {
 
         <MiniInfoCell before={<Icon20CalendarOutline />}>Дата регистрации: 01.01.1970</MiniInfoCell>
 
-        <div style={{ height: 50 }} />
+        <div style={{ height: '150vh' }} />
       </ModalPage>
     </ModalRoot>
   );
@@ -126,7 +128,7 @@ const Details = observer(({ id, go, sizeX }) => {
           left={
             <PanelHeaderBack
               onClick={() => {
-                go('main');
+                go(PANEL_MAIN);
                 DetailsUser.infoClear();
               }}
             />

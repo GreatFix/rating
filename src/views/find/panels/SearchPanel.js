@@ -134,7 +134,9 @@ const SearchPanel = observer(({ id, go, onClickFilters, filters }) => {
               User.searchedUsers.list.length > 0 ? (
                 User.searchedUsers.list.map((user) => <UserCell key={user.id} user={user} onClick={onClickUser} />)
               ) : (
-                <Placeholder icon={<Icon56UsersOutline />}>Люди</Placeholder>
+                <Placeholder header={'Люди'} icon={<Icon56UsersOutline />}>
+                  Никого не найдено
+                </Placeholder>
               )
             ) : !User.token ? (
               <Placeholder
@@ -163,12 +165,14 @@ const SearchPanel = observer(({ id, go, onClickFilters, filters }) => {
             User.searchedGroups.list.length > 0 ? (
               User.searchedGroups.list.map((group) => <GroupCell key={group.id} group={group} onClick={onClickGroup} />)
             ) : (
-              <Placeholder>
-                <Icon56Users3Outline />
+              <Placeholder header={'Сообщества'} icon={<Icon56Users3Outline />}>
+                Ничего не найдено
               </Placeholder>
             )
           ) : !deferredText ? (
-            <Placeholder icon={<Icon56Users3Outline />}>Сообщества</Placeholder>
+            <Placeholder header={'Сообщества'} icon={<Icon56Users3Outline />}>
+              Введите название для поиска
+            </Placeholder>
           ) : (
             <ScreenSpinner />
           )}
