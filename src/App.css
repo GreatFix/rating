@@ -9,3 +9,6 @@ body {
 .Overflow {
   overflow: auto;
 }
+.List {
+  height: 50vh;
+}

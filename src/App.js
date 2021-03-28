@@ -13,8 +13,12 @@ import { observer } from 'mobx-react-lite';
 
 import './App.css';
 
+const FIND = 'FIND';
+const PROFILE = 'PROFILE';
+const REVIEWS = 'REVIEWS';
+
 const App = observer(() => {
-  const [activeStory, setActiveStory] = useState('find');
+  const [activeStory, setActiveStory] = useState(FIND);
 
   if (!User.id) {
     User.getUserInfo();
@@ -43,30 +47,30 @@ const App = observer(() => {
             <Tabbar>
               <TabbarItem
                 onClick={() => {
-                  setActiveStory('find');
+                  setActiveStory(FIND);
                 }}
-                selected={activeStory === 'find'}
-                data-story="find"
+                selected={activeStory === FIND}
+                data-story={FIND}
                 text="Найти"
               >
                 <Icon20Search />
               </TabbarItem>
               <TabbarItem
                 onClick={() => {
-                  setActiveStory('reviews');
+                  setActiveStory(REVIEWS);
                 }}
-                selected={activeStory === 'reviews'}
-                data-story="reviews"
+                selected={activeStory === REVIEWS}
+                data-story={REVIEWS}
                 text="Отзывы"
               >
                 <Icon24Chats />
               </TabbarItem>
               <TabbarItem
                 onClick={() => {
-                  setActiveStory('profile');
+                  setActiveStory(PROFILE);
                 }}
-                selected={activeStory === 'profile'}
-                data-story="profile"
+                selected={activeStory === PROFILE}
+                data-story={PROFILE}
                 label="12"
                 text="Профиль"
               >
@@ -75,9 +79,9 @@ const App = observer(() => {
             </Tabbar>
           }
         >
-          <Find id="find" activePanel="find" />
-          <Reviews id="reviews" activePanel="reviews" />
-          <Profile id="profile" activePanel="profile" />
+          <Find id={FIND} />
+          <Reviews id={REVIEWS} activePanel={REVIEWS} />
+          <Profile id={PROFILE} activePanel={PROFILE} />
         </Epic>
       </AppRoot>
     </AdaptivityProvider>

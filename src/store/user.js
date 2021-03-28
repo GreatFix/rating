@@ -2,13 +2,13 @@ import { makeAutoObservable, runInAction } from 'mobx';
 import bridge from '@vkontakte/vk-bridge';
 
 class User {
-  id = localStorage.getItem('USER_ID');
-  firstName = localStorage.getItem('USER_FIRST_NAME');
-  lastName = localStorage.getItem('USER_LAST_NAME');
-  token = localStorage.getItem('USER_TOKEN');
+  id = null;
+  firstName = null;
+  lastName = null;
+  token = null;
   tokenFG = {
-    token: localStorage.getItem('USER_TOKEN_FG'),
-    permission: localStorage.getItem('USER_TOKEN_FG_ACCESS'),
+    token: null,
+    permission: null,
   };
   friends = { fetched: false, list: [] };
   groups = { fetched: false, list: [] };
@@ -31,9 +31,6 @@ class User {
           this.id = res.id;
           this.firstName = res.first_name;
           this.lastName = res.last_name;
-          localStorage.setItem('USER_ID', res.id);
-          localStorage.setItem('USER_FIRST_NAME', res.first_name);
-          localStorage.setItem('USER_LAST_NAME', res.last_name);
         });
       })
       .catch((err) => console.error(err));
@@ -47,14 +44,9 @@ class User {
       })
       .then((res) => {
         runInAction(() => {
-          if (
-            (res.access_token && !res.scope) ||
-            (res.access_token && res.scope === 'friends,groups')
-          ) {
+          if ((res.access_token && !res.scope) || (res.access_token && res.scope === 'friends,groups')) {
             this.tokenFG.token = res.access_token;
             this.tokenFG.permission = 'allowed';
-            localStorage.setItem('USER_TOKEN_FG', res.access_token);
-            localStorage.setItem('USER_TOKEN_FG_ACCESS', 'allowed');
           }
         });
       })
@@ -62,7 +54,6 @@ class User {
         runInAction(() => {
           if (err.error_data.error_code === 4) {
             this.tokenFG.permission = 'denied';
-            localStorage.setItem('USER_TOKEN_FG_ACCESS', 'denied');
           }
           console.error(err);
         });
@@ -77,7 +68,6 @@ class User {
       .then((res) => {
         runInAction(() => {
           this.token = res.access_token;
-          localStorage.setItem('USER_TOKEN', res.access_token);
         });
       })
       .catch((err) => console.error(err));
@@ -99,8 +89,7 @@ class User {
         .then((res) => {
           runInAction(() => {
             if (offset > 0) {
-              if (!(offset > res.response.count))
-                this.friends.list = this.friends.list.concat(res.response.items);
+              if (!(offset > res.response.count)) this.friends.list = this.friends.list.concat(res.response.items);
             } else {
               this.friends.list = res.response.items;
               this.friends.fetched = true;
@@ -128,8 +117,7 @@ class User {
         .then((res) => {
           runInAction(() => {
             if (offset > 0) {
-              if (!(offset > res.response.count))
-                this.groups.list = this.groups.list.concat(res.response.items);
+              if (!(offset > res.response.count)) this.groups.list = this.groups.list.concat(res.response.items);
             } else {
               this.groups.list = res.response.items;
               this.groups.fetched = true;
@@ -147,7 +135,11 @@ class User {
           method: 'users.search',
           params: {
             q: text,
-            ...filters,
+            country: filters.country && filters.country.id,
+            city: filters.city && filters.city.id,
+            sex: filters.sex,
+            age_from: filters.age_from,
+            age_to: filters.age_to,
             count,
             offset,
             fields: 'id,nickname,domain,photo_50,city,activities',

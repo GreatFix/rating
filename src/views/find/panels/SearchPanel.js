@@ -10,13 +10,14 @@ import {
   ScreenSpinner,
   List,
   Button,
+  Search,
 } from '@vkontakte/vkui';
 import {
   Icon56UsersOutline,
   Icon56ErrorTriangleOutline,
   Icon56Users3Outline,
+  Icon28SlidersOutline,
 } from '@vkontakte/icons';
-import Search from '../components/Search/Search';
 import { useDebounce } from 'use-lodash-debounce';
 import User from '../../../store/user';
 import DetailsUser from '../../../store/detailsUser';
@@ -25,13 +26,17 @@ import { observer } from 'mobx-react-lite';
 import UserCell from '../components/UserCell/UserCell';
 import GroupCell from '../components/GroupCell/GroupCell';
 
-const SearchResult = observer(({ id, go }) => {
+const PANEL_DETAILS_USER = 'PANEL_DETAILS_USER';
+const PANEL_DETAILS_GROUP = 'PANEL_DETAILS_GROUP';
+const PANEL_MAIN = 'PANEL_MAIN';
+
+const SearchPanel = observer(({ id, go, onClickFilters, filters }) => {
   const [searchSwitch, setSearchSwitch] = useState('users');
   const offset = useRef(0);
   const scrollHeight = useRef(0);
+  const searchRef = useRef(null);
 
   const [text, setText] = useState('');
-  const [filters, setFilters] = useState({});
   const deferredText = useDebounce(text, 500);
 
   useEffect(() => {
@@ -39,9 +44,13 @@ const SearchResult = observer(({ id, go }) => {
     if (searchSwitch === 'users') {
       User.searchUsers(deferredText, filters);
     } else if (searchSwitch === 'groups' && deferredText) {
-      User.searchGroups(deferredText, filters);
+      User.searchGroups(deferredText, {});
     }
   }, [deferredText, filters, searchSwitch]);
+
+  useEffect(() => {
+    searchRef.current.focus();
+  }, []);
 
   const onScroll = (e) => {
     if (
@@ -53,7 +62,7 @@ const SearchResult = observer(({ id, go }) => {
       if (searchSwitch === 'users') {
         User.searchUsers(deferredText, filters, offset.current);
       } else if (searchSwitch === 'groups') {
-        User.searchGroups(deferredText, filters, offset.current);
+        User.searchGroups(deferredText, {}, offset.current);
       }
     }
   };
@@ -62,7 +71,7 @@ const SearchResult = observer(({ id, go }) => {
     (user) => {
       DetailsUser.setId(user.id);
       DetailsUser.getInfo(User.token);
-      go('detailsUser');
+      go(PANEL_DETAILS_USER);
     },
     [go]
   );
@@ -71,7 +80,7 @@ const SearchResult = observer(({ id, go }) => {
     (group) => {
       DetailsGroup.setId(group.id);
       DetailsGroup.getInfo(User.token);
-      go('detailsGroup');
+      go(PANEL_DETAILS_GROUP);
     },
     [go]
   );
@@ -82,7 +91,7 @@ const SearchResult = observer(({ id, go }) => {
         left={
           <PanelHeaderBack
             onClick={() => {
-              go('main');
+              go(PANEL_MAIN);
             }}
           />
         }
@@ -90,11 +99,13 @@ const SearchResult = observer(({ id, go }) => {
         Поиск
       </PanelHeader>
       <Search
-        focus={true}
-        searchSwitch={searchSwitch}
-        text={text}
-        setText={setText}
-        setFilters={setFilters}
+        getRef={searchRef}
+        value={text}
+        onChange={(e) => {
+          setText(e.target.value);
+        }}
+        icon={searchSwitch === 'users' && <Icon28SlidersOutline width={24} height={24} />}
+        onIconClick={searchSwitch === 'users' && onClickFilters}
       />
       <Group>
         <FormItem>
@@ -121,9 +132,7 @@ const SearchResult = observer(({ id, go }) => {
           <List>
             {User.searchedUsers.fetched ? (
               User.searchedUsers.list.length > 0 ? (
-                User.searchedUsers.list.map((user) => (
-                  <UserCell key={user.id} user={user} onClick={onClickUser} />
-                ))
+                User.searchedUsers.list.map((user) => <UserCell key={user.id} user={user} onClick={onClickUser} />)
               ) : (
                 <Placeholder icon={<Icon56UsersOutline />}>Люди</Placeholder>
               )
@@ -152,9 +161,7 @@ const SearchResult = observer(({ id, go }) => {
         <Group>
           {User.searchedGroups.fetched ? (
             User.searchedGroups.list.length > 0 ? (
-              User.searchedGroups.list.map((group) => (
-                <GroupCell key={group.id} group={group} onClick={onClickGroup} />
-              ))
+              User.searchedGroups.list.map((group) => <GroupCell key={group.id} group={group} onClick={onClickGroup} />)
             ) : (
               <Placeholder>
                 <Icon56Users3Outline />
@@ -171,4 +178,4 @@ const SearchResult = observer(({ id, go }) => {
   );
 });
 
-export default SearchResult;
+export default SearchPanel;

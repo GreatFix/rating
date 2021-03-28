@@ -11,7 +11,7 @@ const Details = observer(({ id, go }) => {
         left={
           <PanelHeaderBack
             onClick={() => {
-              go('main');
+              go('searchPanel');
               DetailsUser.infoClear();
             }}
           />

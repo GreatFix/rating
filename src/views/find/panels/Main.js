@@ -10,21 +10,23 @@ import {
   ScreenSpinner,
   List,
   Button,
+  Search,
 } from '@vkontakte/vkui';
-import {
-  Icon56UsersOutline,
-  Icon56ErrorTriangleOutline,
-  Icon56Users3Outline,
-} from '@vkontakte/icons';
+import { Icon56UsersOutline, Icon56ErrorTriangleOutline, Icon56Users3Outline } from '@vkontakte/icons';
 import { observer } from 'mobx-react-lite';
 import User from '../../../store/user';
-import Search from '../components/Search/Search';
 import UserCell from '../components/UserCell/UserCell';
 import GroupCell from '../components/GroupCell/GroupCell';
 import DetailsUser from '../../../store/detailsUser';
 
+const PANEL_SEARCH = 'PANEL_SEARCH';
+const PANEL_DETAILS_USER = 'PANEL_DETAILS_USER';
+const PANEL_DETAILS_GROUP = 'PANEL_DETAILS_GROUP';
+const TAB_FRIENDS = 'TAB_FRIENDS';
+const TAB_GROUPS = 'TAB_GROUPS';
+
 const Main = observer(({ id, go }) => {
-  const [activeTab, setActiveTab] = useState('friends');
+  const [activeTab, setActiveTab] = useState(TAB_FRIENDS);
   const offset = useRef(0);
   const scrollHeight = useRef(0);
 
@@ -34,9 +36,9 @@ const Main = observer(({ id, go }) => {
         User.getTokenFG();
       } else {
         offset.current = 0;
-        if (activeTab === 'friends' && !User.friends.fetched) {
+        if (activeTab === TAB_FRIENDS && !User.friends.fetched) {
           User.fetchFriends();
-        } else if (activeTab === 'groups' && !User.groups.fetched) {
+        } else if (activeTab === TAB_GROUPS && !User.groups.fetched) {
           User.fetchGroups();
         }
       }
@@ -51,9 +53,9 @@ const Main = observer(({ id, go }) => {
     ) {
       scrollHeight.current = e.target.scrollHeight;
       offset.current = offset.current + 20;
-      if (activeTab === 'friends') {
+      if (activeTab === TAB_FRIENDS) {
         User.fetchFriends(offset.current);
-      } else if (activeTab === 'groups') {
+      } else if (activeTab === TAB_GROUPS) {
         User.fetchGroups(offset.current);
       }
     }
@@ -63,7 +65,7 @@ const Main = observer(({ id, go }) => {
     (user) => {
       DetailsUser.setId(user.id);
       DetailsUser.getInfo(User.token);
-      go('detailsUser');
+      go(PANEL_DETAILS_USER);
     },
     [go]
   );
@@ -72,7 +74,7 @@ const Main = observer(({ id, go }) => {
     (group) => {
       // DetailsGroup.setId(group.id);
       // DetailsGroup.getInfo(User.token);
-      go('detailsGroup');
+      go(PANEL_DETAILS_GROUP);
     },
     [go]
   );
@@ -82,36 +84,34 @@ const Main = observer(({ id, go }) => {
       <PanelHeader>Найти</PanelHeader>
       <Search
         onFocus={() => {
-          go('searchPanel');
+          go(PANEL_SEARCH);
           User.clearFetchedInfo();
         }}
       />
       <Tabs>
         <TabsItem
           onClick={() => {
-            setActiveTab('friends');
+            setActiveTab(TAB_FRIENDS);
           }}
-          selected={activeTab === 'friends'}
+          selected={activeTab === TAB_FRIENDS}
         >
           Друзья
         </TabsItem>
         <TabsItem
           onClick={() => {
-            setActiveTab('groups');
+            setActiveTab(TAB_GROUPS);
           }}
-          selected={activeTab === 'groups'}
+          selected={activeTab === TAB_GROUPS}
         >
           Сообщества
         </TabsItem>
       </Tabs>
-      {activeTab === 'friends' ? (
+      {activeTab === TAB_FRIENDS ? (
         <Group>
           <List>
             {User.friends.fetched ? (
               User.friends.list.length > 0 ? (
-                User.friends.list.map((friend) => (
-                  <UserCell key={friend.id} user={friend} onClick={onClickUser} />
-                ))
+                User.friends.list.map((friend) => <UserCell key={friend.id} user={friend} onClick={onClickUser} />)
               ) : (
                 <Placeholder icon={<Icon56UsersOutline />}>Друзья</Placeholder>
               )
@@ -141,9 +141,7 @@ const Main = observer(({ id, go }) => {
           <List>
             {User.groups.fetched ? (
               User.groups.list.length > 0 ? (
-                User.groups.list.map((group) => (
-                  <GroupCell key={group.id} group={group} onClick={onClickGroup} />
-                ))
+                User.groups.list.map((group) => <GroupCell key={group.id} group={group} onClick={onClickGroup} />)
               ) : (
                 <Placeholder icon={<Icon56Users3Outline />}>Сообщества</Placeholder>
               )
