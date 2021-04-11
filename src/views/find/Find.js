@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState, useContext } from 'react';
 import {
   View,
   ModalRoot,
@@ -25,8 +25,8 @@ import DetailsGroup from './panels/DetailsGroup';
 import SearchPanel from './panels/SearchPanel';
 import SliderSwitch from './components/SliderSwitch/SliderSwitch';
 import Slider from './components/Slider/Slider';
-import Filters from '../../store/filters';
-import User from '../../store/user';
+
+import { StoreContext } from '../../store/store';
 
 import { observer } from 'mobx-react-lite';
 
@@ -39,35 +39,36 @@ const MODAL_PAGE_SELECT_COUNTRY = 'SELECT_COUNTRY';
 const MODAL_PAGE_SELECT_CITY = 'SELECT_CITY';
 
 const Find = observer(({ id }) => {
+  const Store = useContext(StoreContext);
   const { viewWidth } = useAdaptivity();
   const isMobile = viewWidth <= 2;
   const [activePanel, setActivePanel] = useState(PANEL_MAIN);
   const [activeModal, setActiveModal] = useState(null);
   const [text, setText] = useState('');
   const [filters, setFilters] = useState({
-    country: Filters.country,
-    city: Filters.city,
-    sex: Filters.sex,
-    age_from: Filters.age_from,
-    age_to: Filters.age_to,
+    country: Store.filters.country,
+    city: Store.filters.city,
+    sex: Store.filters.sex,
+    age_from: Store.filters.age_from,
+    age_to: Store.filters.age_to,
   });
 
   const go = useCallback((panelName) => setActivePanel(panelName), []);
 
   useEffect(() => {
-    Filters.country && Filters.getCities(User.token, text);
-  }, [text]);
+    Store.filters.country && Store.filters.getCities(text);
+  }, [Store.filters, text]);
 
   const onCloseModal = useCallback(() => {
     setFilters({
-      country: Filters.country,
-      city: Filters.city,
-      sex: Filters.sex,
-      age_from: Filters.age_from,
-      age_to: Filters.age_to,
+      country: Store.filters.country,
+      city: Store.filters.city,
+      sex: Store.filters.sex,
+      age_from: Store.filters.age_from,
+      age_to: Store.filters.age_to,
     });
     setActiveModal(null);
-  }, []);
+  }, [Store.filters.age_from, Store.filters.age_to, Store.filters.city, Store.filters.country, Store.filters.sex]);
 
   const onActiveModalFilters = useCallback(() => {
     setActiveModal(MODAL_PAGE_FILTERS);
@@ -78,38 +79,50 @@ const Find = observer(({ id }) => {
   }, []);
 
   const onActiveModalSelectCity = useCallback(() => {
-    Filters.country && setActiveModal(MODAL_PAGE_SELECT_CITY);
-  }, []);
+    Store.filters.country && setActiveModal(MODAL_PAGE_SELECT_CITY);
+  }, [Store.filters.country]);
 
-  const onClickCountry = useCallback((country) => {
-    Filters.setCountry(country);
-    Filters.getCities(User.token);
-    setActiveModal(MODAL_PAGE_FILTERS);
-  }, []);
+  const onClickCountry = useCallback(
+    (country) => {
+      Store.filters.setCountry(country);
+      Store.filters.getCities();
+      setActiveModal(MODAL_PAGE_FILTERS);
+    },
+    [Store.filters]
+  );
 
-  const onClickCity = useCallback((city) => {
-    Filters.setCity(city);
-    setText('');
-    setActiveModal(MODAL_PAGE_FILTERS);
-  }, []);
+  const onClickCity = useCallback(
+    (city) => {
+      Store.filters.setCity(city);
+      setText('');
+      setActiveModal(MODAL_PAGE_FILTERS);
+    },
+    [Store.filters]
+  );
 
-  const onSwitchSex = useCallback((value) => {
-    Filters.setSex(value);
-  }, []);
+  const onSwitchSex = useCallback(
+    (value) => {
+      Store.filters.setSex(value);
+    },
+    [Store.filters]
+  );
 
   const onClickFilters = useCallback(() => {
     onActiveModalFilters();
-    Filters.listCountries.length === 0 && Filters.getCountries(User.token);
-  }, [onActiveModalFilters]);
+    Store.filters.listCountries.length === 0 && Store.filters.getCountries();
+  }, [Store.filters, onActiveModalFilters]);
 
   const onRefreshFilters = useCallback(() => {
-    Filters.filterClear();
-  }, []);
+    Store.filters.filterClear();
+  }, [Store.filters]);
 
-  const onChangeSliderAge = useCallback((value) => {
-    Filters.setAge_from(value[0]);
-    Filters.setAge_to(value[1]);
-  }, []);
+  const onChangeSliderAge = useCallback(
+    (value) => {
+      Store.filters.setAge_from(value[0]);
+      Store.filters.setAge_to(value[1]);
+    },
+    [Store.filters]
+  );
 
   const modal = (
     <ModalRoot activeModal={activeModal}>
@@ -133,17 +146,17 @@ const Find = observer(({ id }) => {
         <Group>
           <FormItem top="Страна" onClick={onActiveModalSelectCountry}>
             <SelectMimicry sizeY={SizeType.COMPACT} placeholder="Не выбрана">
-              {Filters.country && Filters.country.title}
+              {Store.filters.country && Store.filters.country.title}
             </SelectMimicry>
           </FormItem>
           <FormItem top="Город" onClick={onActiveModalSelectCity}>
-            <SelectMimicry sizeY={SizeType.COMPACT} placeholder="Не выбран" disabled={!Filters.country}>
-              {Filters.city && Filters.city.title}
+            <SelectMimicry sizeY={SizeType.COMPACT} placeholder="Не выбран" disabled={!Store.filters.country}>
+              {Store.filters.city && Store.filters.city.title}
             </SelectMimicry>
           </FormItem>
           <FormItem>
             <SliderSwitch
-              activeValue={Filters.sex}
+              activeValue={Store.filters.sex}
               options={[
                 {
                   name: 'Женский',
@@ -162,8 +175,8 @@ const Find = observer(({ id }) => {
               min={14}
               max={80}
               step={1}
-              age_from={Filters.age_from}
-              age_to={Filters.age_to}
+              age_from={Store.filters.age_from}
+              age_to={Store.filters.age_to}
               onChange={onChangeSliderAge}
             />
           </FormItem>
@@ -189,8 +202,8 @@ const Find = observer(({ id }) => {
       >
         <Group>
           <List>
-            {Filters.listCountries.length > 0 ? (
-              Filters.listCountries.map((country) => (
+            {Store.filters.listCountries.length > 0 ? (
+              Store.filters.listCountries.map((country) => (
                 <SimpleCell key={country.id} onClick={() => onClickCountry(country)}>
                   {country.title}
                 </SimpleCell>
@@ -217,8 +230,8 @@ const Find = observer(({ id }) => {
         <Group>
           <Search value={text} onChange={(e) => setText(e.target.value)} />
           <List>
-            {Filters.listCities.length > 0 ? (
-              Filters.listCities.map((city) => (
+            {Store.filters.listCities.length > 0 ? (
+              Store.filters.listCities.map((city) => (
                 <SimpleCell key={city.id} onClick={() => onClickCity(city)}>
                   {city.title}
                 </SimpleCell>
