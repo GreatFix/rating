@@ -1,56 +1,24 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useState, useRef, useEffect, useCallback, useContext } from 'react';
 
-import {
-  Panel,
-  PanelHeader,
-  Tabs,
-  TabsItem,
-  Group,
-  Placeholder,
-  PanelSpinner,
-  List,
-  Button,
-  Search,
-} from '@vkontakte/vkui';
+import { Panel, PanelHeader, Tabs, TabsItem, Placeholder, Button, Search } from '@vkontakte/vkui';
 import { Icon56UsersOutline, Icon56ErrorTriangleOutline, Icon56Users3Outline } from '@vkontakte/icons';
 import { observer } from 'mobx-react-lite';
-import User from '../../../store/user';
-import UserCell from '../components/UserCell/UserCell';
-import GroupCell from '../components/GroupCell/GroupCell';
-import DetailsUser from '../../../store/detailsUser';
+
+import { StoreContext } from '../../../store/store';
+import GroupWithList from '../components/GroupWithList/GroupWithList';
 
 const PANEL_SEARCH = 'PANEL_SEARCH';
 const PANEL_DETAILS_USER = 'PANEL_DETAILS_USER';
 const PANEL_DETAILS_GROUP = 'PANEL_DETAILS_GROUP';
 const TAB_FRIENDS = 'TAB_FRIENDS';
 const TAB_GROUPS = 'TAB_GROUPS';
+const COUNT = 20;
 
 const Main = observer(({ id, go }) => {
-  const [activeTab, setActiveTab] = useState(TAB_FRIENDS);
+  const Store = useContext(StoreContext);
+  const [activeTab, setActiveTab] = useState(TAB_GROUPS);
   const offset = useRef(0);
   const scrollHeight = useRef(0);
-
-  useEffect(() => {
-    if (!(User.tokenFG.permission === 'denied')) {
-      offset.current = 0;
-      if (!User.tokenFG.token) {
-        User.getTokenFG().then((res) => {
-          if (activeTab === TAB_FRIENDS && !User.friends.fetched) {
-            User.fetchFriends();
-          } else if (activeTab === TAB_GROUPS && !User.groups.fetched) {
-            User.fetchGroups();
-          }
-        });
-      } else {
-        if (activeTab === TAB_FRIENDS && !User.friends.fetched) {
-          User.fetchFriends();
-        } else if (activeTab === TAB_GROUPS && !User.groups.fetched) {
-          User.fetchGroups();
-        }
-      }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeTab]);
 
   const onScroll = (e) => {
     if (
@@ -58,32 +26,43 @@ const Main = observer(({ id, go }) => {
       scrollHeight.current !== e.target.scrollHeight
     ) {
       scrollHeight.current = e.target.scrollHeight;
-      offset.current = offset.current + 20;
+      offset.current = offset.current + COUNT;
       if (activeTab === TAB_FRIENDS) {
-        User.fetchFriends(offset.current);
+        Store.bridge.fetchFriends(offset.current);
       } else if (activeTab === TAB_GROUPS) {
-        User.fetchGroups(offset.current);
+        Store.bridge.fetchGroups(offset.current);
       }
     }
   };
 
   const onClickUser = useCallback(
     (user) => {
-      DetailsUser.setId(user.id);
-      DetailsUser.getInfo(User.token);
+      Store.detailsUser.setId(user.id);
+      Store.detailsUser.getInfo();
       go(PANEL_DETAILS_USER);
     },
-    [go]
+    [Store.detailsUser, go]
   );
 
   const onClickGroup = useCallback(
     (group) => {
-      // DetailsGroup.setId(group.id);
-      // DetailsGroup.getInfo(User.token);
+      Store.detailsGroup.setId(group.id);
+      Store.detailsGroup.getInfo();
       go(PANEL_DETAILS_GROUP);
     },
-    [go]
+    [Store.detailsGroup, go]
   );
+
+  useEffect(() => {
+    if (Store.user.bridgeTokenFG.token) {
+      offset.current = 0;
+      if (activeTab === TAB_FRIENDS) {
+        Store.bridge.fetchFriends();
+      } else if (activeTab === TAB_GROUPS) {
+        Store.bridge.fetchGroups();
+      }
+    }
+  }, [Store.bridge, Store.user.bridgeTokenFG.token, activeTab]);
 
   return (
     <Panel id={id} onScroll={onScroll} className="Overflow">
@@ -91,7 +70,7 @@ const Main = observer(({ id, go }) => {
       <Search
         onFocus={() => {
           go(PANEL_SEARCH);
-          User.clearFetchedInfo();
+          Store.bridge.clearFetchedInfo();
         }}
       />
       <Tabs>
@@ -112,70 +91,33 @@ const Main = observer(({ id, go }) => {
           Сообщества
         </TabsItem>
       </Tabs>
-      {activeTab === TAB_FRIENDS ? (
-        <Group>
-          <List>
-            {User.friends.fetched ? (
-              User.friends.list.length > 0 ? (
-                User.friends.list.map((friend) => <UserCell key={friend.id} user={friend} onClick={onClickUser} />)
-              ) : (
-                <Placeholder header={'Друзья'} icon={<Icon56UsersOutline />}>
-                  Не найдено
-                </Placeholder>
-              )
-            ) : User.tokenFG.permission === 'denied' ? (
-              <Placeholder
-                icon={<Icon56ErrorTriangleOutline />}
-                action={
-                  <Button
-                    onClick={() => {
-                      User.getTokenFG();
-                    }}
-                    size="m"
-                  >
-                    Дать доступ
-                  </Button>
-                }
-              >
-                Доступ запрещен
-              </Placeholder>
-            ) : (
-              <PanelSpinner />
-            )}
-          </List>
-        </Group>
+      {Store.user.bridgeTokenFG.permission === 'denied' ? (
+        <Placeholder
+          icon={<Icon56ErrorTriangleOutline />}
+          action={
+            <Button onClick={Store.user.getBridgeTokenFG} size="m">
+              Дать доступ
+            </Button>
+          }
+        >
+          Доступ запрещен
+        </Placeholder>
+      ) : activeTab === TAB_FRIENDS ? (
+        <GroupWithList
+          object={Store.bridge.friends}
+          altHeader={'Друзья'}
+          icon={<Icon56UsersOutline />}
+          onClick={onClickUser}
+          cellType={'UserCell'}
+        />
       ) : (
-        <Group>
-          <List>
-            {User.groups.fetched ? (
-              User.groups.list.length > 0 ? (
-                User.groups.list.map((group) => <GroupCell key={group.id} group={group} onClick={onClickGroup} />)
-              ) : (
-                <Placeholder header={'Сообщества'} icon={<Icon56Users3Outline />}>
-                  Не найдено
-                </Placeholder>
-              )
-            ) : User.tokenFG.permission === 'denied' ? (
-              <Placeholder
-                icon={<Icon56ErrorTriangleOutline />}
-                action={
-                  <Button
-                    onClick={() => {
-                      User.getTokenFG();
-                    }}
-                    size="m"
-                  >
-                    Дать доступ
-                  </Button>
-                }
-              >
-                Доступ запрещен
-              </Placeholder>
-            ) : (
-              <PanelSpinner />
-            )}
-          </List>
-        </Group>
+        <GroupWithList
+          object={Store.bridge.groups}
+          altHeader={'Сообщества'}
+          icon={<Icon56Users3Outline />}
+          onClick={onClickGroup}
+          cellType={'GroupCell'}
+        />
       )}
     </Panel>
   );
