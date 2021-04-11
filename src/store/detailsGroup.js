@@ -1,21 +1,27 @@
 import { makeAutoObservable, runInAction } from 'mobx';
 import bridge from '@vkontakte/vk-bridge';
 
-class DetailsGroup {
+export default class DetailsGroup {
   id = null;
   info = null;
-  constructor() {
+
+  constructor(rootStore) {
     makeAutoObservable(this);
+    this.rootStore = rootStore;
   }
 
-  getInfo(token) {
+  get bridgeToken() {
+    return this.rootStore.user.bridgeToken.token;
+  }
+
+  getInfo() {
     bridge
       .send('VKWebAppCallAPIMethod', {
         method: 'groups.get',
         params: {
           user_ids: `${this.id}`,
           fields: 'domain,photo_50,city,activities',
-          access_token: token,
+          access_token: this.bridgeToken,
           v: '5.130',
         },
       })
@@ -36,5 +42,3 @@ class DetailsGroup {
     this.info = null;
   }
 }
-
-export default new DetailsGroup();

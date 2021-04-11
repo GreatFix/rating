@@ -1,7 +1,7 @@
 import { makeAutoObservable, runInAction } from 'mobx';
 import bridge from '@vkontakte/vk-bridge';
 
-class Filters {
+export default class Filters {
   country = 0;
   city = 0;
   sex = 0;
@@ -9,8 +9,15 @@ class Filters {
   age_to = 80;
   listCountries = [];
   listCities = [];
-  constructor() {
+  rootStore = null;
+
+  get bridgeToken() {
+    return this.rootStore.user.bridgeToken.token;
+  }
+
+  constructor(rootStore) {
     makeAutoObservable(this);
+    this.rootStore = rootStore;
   }
 
   setCountry(country) {
@@ -33,14 +40,14 @@ class Filters {
     this.age_to = age_to;
   }
 
-  getCountries(token) {
+  getCountries() {
     bridge
       .send('VKWebAppCallAPIMethod', {
         method: 'database.getCountries',
         params: {
           need_all: 1,
           count: 1000,
-          access_token: token,
+          access_token: this.bridgeToken,
           v: '5.130',
         },
       })
@@ -52,7 +59,7 @@ class Filters {
       .catch((err) => console.error(err));
   }
 
-  getCities(token, text = '') {
+  getCities(text = '') {
     bridge
       .send('VKWebAppCallAPIMethod', {
         method: 'database.getCities',
@@ -61,7 +68,7 @@ class Filters {
           need_all: 1,
           count: 10,
           country_id: this.country.id,
-          access_token: token,
+          access_token: this.bridgeToken,
           v: '5.130',
         },
       })
@@ -83,5 +90,3 @@ class Filters {
     this.listCities = [];
   }
 }
-
-export default new Filters();
