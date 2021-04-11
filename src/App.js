@@ -8,7 +8,7 @@ import { Icon20Search, Icon24Chats, Icon24UserOutline } from '@vkontakte/icons';
 import Find from './views/find/Find';
 import Reviews from './views/reviews/Reviews';
 import Profile from './views/profile/Profile';
-import User from './store/user';
+
 import { observer } from 'mobx-react-lite';
 
 import './App.css';
@@ -19,14 +19,6 @@ const REVIEWS = 'REVIEWS';
 
 const App = observer(() => {
   const [activeStory, setActiveStory] = useState(PROFILE);
-
-  if (!User.id) {
-    User.getUserInfo();
-  }
-
-  if (!User.token) {
-    User.getToken();
-  }
 
   useEffect(() => {
     bridge.subscribe(({ detail: { type, data } }) => {
