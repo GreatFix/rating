@@ -11,10 +11,10 @@ const UserCell = ({ user, onClick }) => (
     after={
       <div className="UserReviews">
         <Counter size="s" className="UserReviewsCounterPositive">
-          3
+          {user.countPositiveFeedbacks ?? 0}
         </Counter>
         <Counter size="s" mode="prominent">
-          3
+          {user.countNegativeFeedbacks ?? 0}
         </Counter>
       </div>
     }
