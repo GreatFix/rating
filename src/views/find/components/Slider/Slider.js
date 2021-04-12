@@ -6,7 +6,7 @@ const Slider = ({ age_from, age_to, onChange, ...props }) => {
   const startThumbRef = useRef(null);
   const endThumbRef = useRef(null);
 
-  const begoreOnChange = useCallback(
+  const beforeOnChange = useCallback(
     (value) => {
       startThumbRef.current.innerHTML = value[0];
       endThumbRef.current.innerHTML = value[1];
@@ -21,7 +21,7 @@ const Slider = ({ age_from, age_to, onChange, ...props }) => {
     endThumbRef.current = document.querySelector('.ageSlider .vkuiSlider__thumb--end');
     endThumbRef.current.innerHTML = age_to;
   }, [age_from, age_to]);
-  return <RangeSlider className="ageSlider" value={[age_from, age_to]} onChange={begoreOnChange} {...props} />;
+  return <RangeSlider className="ageSlider" value={[age_from, age_to]} onChange={beforeOnChange} {...props} />;
 };
 
 export default Slider;
