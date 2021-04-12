@@ -2,8 +2,8 @@ import { makeAutoObservable, runInAction } from 'mobx';
 import bridge from '@vkontakte/vk-bridge';
 
 export default class Filters {
-  country = 0;
-  city = 0;
+  country = { id: 0, title: '' };
+  city = { id: 0, title: '' };
   sex = 0;
   age_from = 14;
   age_to = 80;
@@ -12,7 +12,7 @@ export default class Filters {
   rootStore = null;
 
   get bridgeToken() {
-    return this.rootStore.user.bridgeToken.token;
+    return this.rootStore.user.bridgeToken;
   }
 
   constructor(rootStore) {
@@ -81,8 +81,8 @@ export default class Filters {
   }
 
   filterClear() {
-    this.country = 0;
-    this.city = 0;
+    this.country = { id: 0, title: '' };
+    this.city = { id: 0, title: '' };
     this.sex = 0;
     this.age_from = 14;
     this.age_to = 80;
