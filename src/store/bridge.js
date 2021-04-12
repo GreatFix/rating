@@ -120,8 +120,8 @@ export default class Bridge {
           method: 'users.search',
           params: {
             q: text,
-            country: filters.country && filters.country.id,
-            city: filters.city && filters.city.id,
+            country: filters.country?.id,
+            city: filters.city?.id,
             sex: filters.sex,
             age_from: filters.age_from,
             age_to: filters.age_to,
@@ -145,7 +145,7 @@ export default class Bridge {
     }
   }
 
-  searchGroups(text, filters, offset = 0, count = 20) {
+  searchGroups(text, filters = {}, offset = 0, count = 20) {
     if (this.bridgeToken) {
       this.setFetching(SEARCHED_GROUPS);
       bridge
