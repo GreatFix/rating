@@ -1,0 +1,65 @@
+@media only screen  and (min-width: 1224px) { 
+  /* Прячем крестик */
+  .Preview .Preview--remove{
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    width: 5px;
+    height: 5px;
+    right: 0;
+    top: 0;
+    font-weight: bold;
+    background: rgba(255, 255, 255, .5);
+  
+    border-radius: 0 0 0 8px;
+    cursor: pointer;
+    transition: all .5s;
+    z-index: 100;
+  }
+  .Preview:hover .Preview--remove{
+    opacity: 1;
+    width: 20px;
+    height: 20px;
+  }
+}
+.Preview{
+  width: auto !important;
+}
+.Preview .Preview--remove{
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  right: 0;
+  top: 0;
+  font-weight: bold;
+  background: rgba(255, 255, 255, .5);
+  border-radius: 0 0 0 8px;
+
+  cursor: pointer;
+  z-index: 101;
+}
+.Preview--image img{
+  object-fit: contain;
+  width: 100%;
+  height: 100%;
+}
+.Preview--error{
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  background-color: rgba(255, 255, 255, .5);
+  z-index: 100;
+  font-size: 10px;
+  top:0;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  color: red;
+}
