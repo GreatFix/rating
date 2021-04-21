@@ -1,11 +1,12 @@
 import { makeAutoObservable } from 'mobx';
 import React from 'react';
-import User from './user';
-import Bridge from './bridge';
-import Backend from './backend';
-import Filters from './filters';
-import DetailsGroup from './detailsGroup';
-import DetailsUser from './detailsUser';
+import User from './User';
+import Find from './Find';
+import Backend from './Backend';
+import Filters from './Filters';
+import Target from './Target';
+import Feedback from './Feedback';
+import Comment from './Comment';
 import { enableLogging } from 'mobx-logger';
 
 const config = {
@@ -21,12 +22,13 @@ enableLogging(config);
 export class Store {
   constructor() {
     makeAutoObservable(this);
-    this.user = new User(this);
-    this.bridge = new Bridge(this);
-    this.backend = new Backend(this);
-    this.filters = new Filters(this);
-    this.detailsGroup = new DetailsGroup(this);
-    this.detailsUser = new DetailsUser(this);
+    this.User = new User(this);
+    this.Find = new Find(this);
+    this.Backend = new Backend(this);
+    this.Filters = new Filters(this);
+    this.Target = new Target(this);
+    this.Feedback = new Feedback(this);
+    this.Comment = new Comment(this);
   }
 }
 

@@ -1,88 +1,67 @@
-import { makeAutoObservable, runInAction, when } from 'mobx';
-import bridge from '@vkontakte/vk-bridge';
+import { makeAutoObservable, when } from 'mobx';
+
+import BRIDGE_API from '../API/bridge';
+
 export default class User {
   userID = null;
+  access_token = null;
+  permissions = '';
   firstName = null;
   lastName = null;
-  backendToken = null;
-  bridgeToken = null;
-  bridgeTokenFG = {
-    token: null,
-    permission: null,
-  };
+  error = null;
+
   constructor(rootStore) {
     makeAutoObservable(this);
     this.rootStore = rootStore;
+    this.permissions = window.location.search.slice(26).split('&')[0];
+
+    when(
+      () => true,
+      () => this.getUserToken('photos, groups, friends')
+    );
     when(
       () => !this.userID,
-      () => this.getUserInfo()
-    );
-    when(
-      () => !this.bridgeToken,
-      () => this.getBridgeToken()
-    );
-    when(
-      () => !this.bridgeTokenFG.fetched,
-      () => this.getBridgeTokenFG()
+      () => {
+        this.getUserInfo();
+      }
     );
   }
 
-  getUserInfo() {
-    bridge
-      .send('VKWebAppGetUserInfo')
-      .then((res) => {
-        runInAction(() => {
-          this.userID = String(res.id);
-          this.firstName = res.first_name;
-          this.lastName = res.last_name;
-        });
-      })
-      .catch(toErrorLog);
+  setUserInfo(res) {
+    this.userID = res.id;
+    this.firstName = res.first_name;
+    this.lastName = res.last_name;
   }
 
-  setBackendToken(token) {
-    this.backendToken = token;
+  setPermissons(scope) {
+    this.permissions = scope;
   }
 
-  getBridgeTokenFG() {
-    bridge
-      .send('VKWebAppGetAuthToken', {
-        app_id: 7799989,
-        scope: 'friends,groups',
-      })
-      .then((res) => {
-        runInAction(() => {
-          if ((res.access_token && !res.scope) || (res.access_token && res.scope === 'friends,groups')) {
-            this.bridgeTokenFG.token = res.access_token;
-            this.bridgeTokenFG.permission = 'allowed';
-          }
-        });
-      })
-      .catch((err) => {
-        runInAction(() => {
-          if (err.error_data.error_code === 4) {
-            this.bridgeTokenFG.permission = 'denied';
-          }
-          console.error(err);
-        });
-      });
+  setToken(token) {
+    this.access_token = token;
   }
 
-  getBridgeToken() {
-    bridge
-      .send('VKWebAppGetAuthToken', {
-        app_id: 7799989,
-        scope: '',
-      })
-      .then((res) => {
-        runInAction(() => {
-          this.bridgeToken = res.access_token;
-        });
-      })
-      .catch(toErrorLog);
+  setError(err) {
+    this.error = err;
   }
-}
 
-function toErrorLog(err) {
-  console.error(err);
+  async getUserInfo() {
+    try {
+      const result = await BRIDGE_API.GET_USER_INFO();
+      this.setUserInfo(result);
+    } catch (err) {
+      this.setError(err);
+    }
+  }
+
+  async getUserToken(scope = '') {
+    try {
+      const result = await BRIDGE_API.GET_AUTH_TOKEN(scope);
+      BRIDGE_API.SET_TOKEN(result.access_token, result.scope);
+      this.setToken(result.access_token);
+      this.setPermissons(this.permissions + ',' + result.scope);
+    } catch (err) {
+      this.setError(err);
+    }
+  }
 }

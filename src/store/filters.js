@@ -1,5 +1,5 @@
-import { makeAutoObservable, runInAction } from 'mobx';
-import bridge from '@vkontakte/vk-bridge';
+import { makeAutoObservable } from 'mobx';
+import BRIDGE_API from '../API/bridge';
 
 export default class Filters {
   country = { id: 0, title: '' };
@@ -10,10 +10,6 @@ export default class Filters {
   listCountries = [];
   listCities = [];
   rootStore = null;
-
-  get bridgeToken() {
-    return this.rootStore.user.bridgeToken;
-  }
 
   constructor(rootStore) {
     makeAutoObservable(this);
@@ -40,44 +36,40 @@ export default class Filters {
     this.age_to = age_to;
   }
 
-  getCountries() {
-    bridge
-      .send('VKWebAppCallAPIMethod', {
-        method: 'database.getCountries',
-        params: {
-          need_all: 1,
-          count: 1000,
-          access_token: this.bridgeToken,
-          v: '5.130',
-        },
-      })
-      .then((res) => {
-        runInAction(() => {
-          this.listCountries = res.response.items;
-        });
-      })
-      .catch((err) => console.error(err));
+  setCountries(list) {
+    this.listCountries = list;
   }
 
-  getCities(text = '') {
-    bridge
-      .send('VKWebAppCallAPIMethod', {
-        method: 'database.getCities',
-        params: {
-          q: text,
-          need_all: 1,
-          count: 10,
-          country_id: this.country.id,
-          access_token: this.bridgeToken,
-          v: '5.130',
-        },
-      })
-      .then((res) => {
-        runInAction(() => {
-          this.listCities = res.response.items;
-        });
-      })
-      .catch((err) => console.error(err));
+  setCities(list) {
+    this.listCities = list;
+  }
+
+  async getCountries() {
+    const params = {
+      need_all: 1,
+      count: 1000,
+    };
+    try {
+      const result = await BRIDGE_API.DB_GET_COUNTRIES(params);
+      this.setCountries(result.response.items);
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  async getCities(q = '') {
+    const params = {
+      q,
+      need_all: 1,
+      count: 10,
+      country_id: this.country.id,
+    };
+    try {
+      const result = await BRIDGE_API.DB_GET_CITIES(params);
+      this.setCities(result.response.items);
+    } catch (err) {
+      console.error(err);
+    }
   }
 
   filterClear() {
@@ -86,7 +78,6 @@ export default class Filters {
     this.sex = 0;
     this.age_from = 14;
     this.age_to = 80;
-    this.listCountries = [];
     this.listCities = [];
   }
 }
