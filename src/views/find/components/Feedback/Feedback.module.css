@@ -1,0 +1,24 @@
+.FeedbackFooter {
+  font-size: 12.5px;
+}
+.CardScroll{
+  padding-top: 4px;
+  margin-left: -16px;
+  padding-bottom: 4px;
+}
+.CardScroll img{
+  object-fit: cover;
+  width: 100%;
+  height: 100%;
+}
+.FeedbackFooter span {
+  color: var(--text_secondary);
+  margin-right: 4px;
+}
+.FeedbackFooter a {
+  text-decoration: none;
+  color: var(--text_link);
+}
+.FeedbackFooter a:hover {
+  text-decoration: underline;
+}
