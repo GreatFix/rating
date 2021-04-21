@@ -1,5 +1,6 @@
 import React from 'react';
 import { Icon24CupOutline } from '@vkontakte/icons';
+import { observer } from 'mobx-react-lite';
 
 const COLORS = {
   neutral: '#99A2AD',
@@ -7,14 +8,14 @@ const COLORS = {
   negative: '#FF3D50',
 };
 
-const Popular = ({ positive, negative }) => {
+const Popular = observer(({ positive, negative }) => {
   const popular = getPopular(positive, negative);
   return (
     <>
       <Icon24CupOutline fill={COLORS[popular.rang]} /> {popular.count}
     </>
   );
-};
+});
 
 export default Popular;
 

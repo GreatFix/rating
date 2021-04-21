@@ -6,7 +6,7 @@ let SCOPE = window.location.search.slice(26).split('&')[0]
 class BRIDGE_API {
   SET_TOKEN(token, scope) {
     ACCESS_TOKEN = token
-    SCOPE = scope.length > SCOPE.length ? scope : SCOPE
+    SCOPE = SCOPE + ',' + scope
   }
 
   async GET_USER_INFO() {
@@ -66,6 +66,20 @@ class BRIDGE_API {
   async DB_GET_COUNTRIES(params = {}) {
     return await bridge.send(API_METHOD, {
       method: 'database.getCountries',
+      params: setV(params)
+    })
+  }
+
+  async GET_UPLOAD_SERVER(params = {}) {
+    return await bridge.send(API_METHOD, {
+      method: 'photos.getUploadServer',
+      params: setV(params)
+    })
+  }
+
+  async PHOTOS_SAVE(params = {}) {
+    return await bridge.send(API_METHOD, {
+      method: 'photos.save',
       params: setV(params)
     })
   }

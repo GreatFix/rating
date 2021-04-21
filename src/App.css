@@ -7,5 +7,5 @@ body {
   width: 0;
 }
 .Overflow {
-  overflow: auto;
+  overflow: scroll;
 }

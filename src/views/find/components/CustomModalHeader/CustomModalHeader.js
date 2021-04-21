@@ -22,4 +22,4 @@ const CustomModalHeader = (props) => (
   </ModalPageHeader>
 );
 
-export default CustomModalHeader;
+export default React.memo(CustomModalHeader);

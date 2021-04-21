@@ -1,8 +1,9 @@
 import React from 'react';
 import { RichCell, Avatar, Counter } from '@vkontakte/vkui';
+import { observer } from 'mobx-react-lite';
 import './UserCell.css';
 
-const UserCell = ({ user, onClick }) => (
+const UserCell = observer(({ user, onClick }) => (
   <RichCell
     before={<Avatar size={48} src={user.photo_50} />}
     text={user.activities}
@@ -22,6 +23,6 @@ const UserCell = ({ user, onClick }) => (
   >
     {`${user.first_name} ${user.last_name}`}
   </RichCell>
-);
+));
 
-export default React.memo(UserCell);
+export default UserCell;
