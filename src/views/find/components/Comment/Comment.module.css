@@ -1,0 +1,24 @@
+.CommentFooter {
+  font-size: 12.5px;
+}
+.CardGrid{
+  padding-top: 4px;
+  margin-left: -16px;
+}
+.CardGrid img{
+  object-fit: cover;
+  width: 100%;
+  height: 80px;
+}
+.CommentFooter span {
+  color: var(--text_secondary);
+  margin-right: 4px;
+}
+
+.Reply,.Greeting {
+  text-decoration: none;
+  color: var(--text_link);
+}
+.Reply:hover,.Greeting:hover {
+  text-decoration: underline;
+}
