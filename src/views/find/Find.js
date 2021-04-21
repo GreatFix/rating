@@ -1,11 +1,10 @@
-import React, { useCallback, useEffect, useState, useContext } from 'react';
+import React, { useCallback, useEffect, useState, useContext, useRef, useMemo } from 'react';
 import {
   View,
   ModalRoot,
   ModalPage,
   ModalPageHeader,
   PanelHeaderClose,
-  PanelHeaderSubmit,
   Group,
   Placeholder,
   SimpleCell,
@@ -16,59 +15,60 @@ import {
   SelectMimicry,
   PanelHeaderButton,
   Button,
+  usePlatform,
 } from '@vkontakte/vkui';
-import { useAdaptivity } from '@vkontakte/vkui/dist/hooks/useAdaptivity';
 import { Icon24HomeOutline, Icon28RefreshOutline, Icon16Globe } from '@vkontakte/icons';
-import Main from './panels/Main';
-import DetailsUser from './panels/DetailsUser';
-import DetailsGroup from './panels/DetailsGroup';
-import SearchPanel from './panels/SearchPanel';
-import SliderSwitch from './components/SliderSwitch/SliderSwitch';
+import { observer } from 'mobx-react-lite';
+import MainPanel from './panels/MainPanel/MainPanel';
+import TargetPanel from './panels/TargetPanel/TargetPanel';
+import FeedbackPanel from './panels/FeedbackPanel/FeedbackPanel';
+import CommentPanel from './panels/CommentPanel/CommentPanel';
+import SearchPanel from './panels/SearchPanel/SearchPanel';
 import Slider from './components/Slider/Slider';
 
+import CustomModalHeader from './components/CustomModalHeader/CustomModalHeader';
+import CustomSliderSwitch from './components/SliderSwitch/SliderSwitch';
 import { StoreContext } from '../../store/store';
+import Details from './components/Details/Details';
+import History from '../../utils/history';
 
-import { observer } from 'mobx-react-lite';
-
-const PANEL_DETAILS_USER = 'PANEL_DETAILS_USER';
-const PANEL_DETAILS_GROUP = 'PANEL_DETAILS_GROUP';
+const PANEL_TARGET = 'PANEL_TARGET';
 const PANEL_MAIN = 'PANEL_MAIN';
 const PANEL_SEARCH = 'PANEL_SEARCH';
-const MODAL_PAGE_FILTERS = 'FILTERS';
-const MODAL_PAGE_SELECT_COUNTRY = 'SELECT_COUNTRY';
-const MODAL_PAGE_SELECT_CITY = 'SELECT_CITY';
+const PANEL_FEEDBACK = 'PANEL_FEEDBACK';
+const PANEL_COMMENT = 'PANEL_COMMENT';
+
+const MODAL_PAGE_FILTERS = 'MODAL_PAGE_FILTERS';
+const MODAL_PAGE_SELECT_COUNTRY = 'MODAL_PAGE_SELECT_COUNTRY';
+const MODAL_PAGE_SELECT_CITY = 'MODAL_PAGE_SELECT_CITY';
+const MODAL_PAGE_DETAILS = 'MODAL_PAGE_DETAILS';
 
 const Find = observer(({ id }) => {
   const Store = useContext(StoreContext);
-  const { viewWidth } = useAdaptivity();
-  const isMobile = viewWidth <= 2;
+  const platform = usePlatform();
   const [activePanel, setActivePanel] = useState(PANEL_MAIN);
   const [activeModal, setActiveModal] = useState(null);
+  const [popout, setPopout] = useState(null);
   const [text, setText] = useState('');
-  const [filters, setFilters] = useState({
-    country: Store.filters.country,
-    city: Store.filters.city,
-    sex: Store.filters.sex,
-    age_from: Store.filters.age_from,
-    age_to: Store.filters.age_to,
-  });
+  const [ageSlider, setAgeSlider] = useState({ age_from: 14, age_to: 80 });
+  const debouncedSetAge = useRef();
 
-  const go = useCallback((panelName) => setActivePanel(panelName), []);
+  const forward = useCallback((prev, next) => {
+    setActivePanel(next);
+    History.add(prev);
+  }, []);
+
+  const back = useCallback(() => {
+    setActivePanel(History.back());
+  }, []);
 
   useEffect(() => {
-    Store.filters.country && Store.filters.getCities(text);
-  }, [Store.filters, text]);
+    Store.Filters.country.id && Store.Filters.getCities(text);
+  }, [Store.Filters, text]);
 
   const onCloseModal = useCallback(() => {
-    setFilters({
-      country: Store.filters.country,
-      city: Store.filters.city,
-      sex: Store.filters.sex,
-      age_from: Store.filters.age_from,
-      age_to: Store.filters.age_to,
-    });
     setActiveModal(null);
-  }, [Store.filters.age_from, Store.filters.age_to, Store.filters.city, Store.filters.country, Store.filters.sex]);
+  }, []);
 
   const onActiveModalFilters = useCallback(() => {
     setActiveModal(MODAL_PAGE_FILTERS);
@@ -79,49 +79,57 @@ const Find = observer(({ id }) => {
   }, []);
 
   const onActiveModalSelectCity = useCallback(() => {
-    Store.filters.country && setActiveModal(MODAL_PAGE_SELECT_CITY);
-  }, [Store.filters.country]);
+    Store.Filters.country.id && setActiveModal(MODAL_PAGE_SELECT_CITY);
+  }, [Store.Filters.country]);
+
+  const onActiveModalDetails = useCallback(() => {
+    setActiveModal(MODAL_PAGE_DETAILS);
+  }, []);
 
   const onClickCountry = useCallback(
     (country) => {
-      Store.filters.setCountry(country);
-      Store.filters.getCities();
+      Store.Filters.setCountry(country);
+      Store.Filters.getCities();
       setActiveModal(MODAL_PAGE_FILTERS);
     },
-    [Store.filters]
+    [Store.Filters]
   );
 
   const onClickCity = useCallback(
     (city) => {
-      Store.filters.setCity(city);
+      Store.Filters.setCity(city);
       setText('');
       setActiveModal(MODAL_PAGE_FILTERS);
     },
-    [Store.filters]
+    [Store.Filters]
   );
 
   const onSwitchSex = useCallback(
     (value) => {
-      Store.filters.setSex(value);
+      Store.Filters.setSex(value);
     },
-    [Store.filters]
+    [Store.Filters]
   );
 
   const onClickFilters = useCallback(() => {
     onActiveModalFilters();
-    Store.filters.listCountries.length === 0 && Store.filters.getCountries();
-  }, [Store.filters, onActiveModalFilters]);
+    Store.Filters.listCountries.length === 0 && Store.Filters.getCountries();
+  }, [Store.Filters, onActiveModalFilters]);
 
   const onRefreshFilters = useCallback(() => {
-    Store.filters.filterClear();
-  }, [Store.filters]);
+    Store.Filters.filterClear();
+  }, [Store.Filters]);
 
   const onChangeSliderAge = useCallback(
     (value) => {
-      Store.filters.setAge_from(value[0]);
-      Store.filters.setAge_to(value[1]);
+      if (debouncedSetAge.current) clearTimeout(debouncedSetAge.current);
+      debouncedSetAge.current = setTimeout(() => {
+        Store.Filters.setAge_from(value[0]);
+        Store.Filters.setAge_to(value[1]);
+      }, 250);
+      setAgeSlider({ age_from: value[0], age_to: value[1] });
     },
-    [Store.filters]
+    [Store.Filters]
   );
 
   const modal = (
@@ -132,7 +140,7 @@ const Find = observer(({ id }) => {
         onClose={onCloseModal}
         header={
           <ModalPageHeader
-            left={isMobile && <PanelHeaderClose onClick={onCloseModal} />}
+            left={<PanelHeaderClose onClick={onCloseModal} />}
             right={
               <PanelHeaderButton>
                 <Icon28RefreshOutline onClick={onRefreshFilters} />
@@ -146,17 +154,17 @@ const Find = observer(({ id }) => {
         <Group>
           <FormItem top="Страна" onClick={onActiveModalSelectCountry}>
             <SelectMimicry sizeY={SizeType.COMPACT} placeholder="Не выбрана">
-              {Store.filters.country && Store.filters.country.title}
+              {Store.Filters?.country?.title}
             </SelectMimicry>
           </FormItem>
           <FormItem top="Город" onClick={onActiveModalSelectCity}>
-            <SelectMimicry sizeY={SizeType.COMPACT} placeholder="Не выбран" disabled={!Store.filters.country}>
-              {Store.filters.city && Store.filters.city.title}
+            <SelectMimicry sizeY={SizeType.COMPACT} placeholder="Не выбран" disabled={!Store.Filters.country.id}>
+              {Store.Filters?.city?.title}
             </SelectMimicry>
           </FormItem>
           <FormItem>
-            <SliderSwitch
-              activeValue={Store.filters.sex}
+            <CustomSliderSwitch
+              activeValue={Store.Filters.sex}
               options={[
                 {
                   name: 'Женский',
@@ -175,8 +183,8 @@ const Find = observer(({ id }) => {
               min={14}
               max={80}
               step={1}
-              age_from={Store.filters.age_from}
-              age_to={Store.filters.age_to}
+              age_from={ageSlider.age_from}
+              age_to={ageSlider.age_to}
               onChange={onChangeSliderAge}
             />
           </FormItem>
@@ -189,21 +197,18 @@ const Find = observer(({ id }) => {
       </ModalPage>
       <ModalPage
         id={MODAL_PAGE_SELECT_COUNTRY}
+        className="Overflow"
         onClose={onActiveModalFilters}
         header={
-          <ModalPageHeader
-            left={isMobile && <PanelHeaderClose onClick={onActiveModalFilters} />}
-            right={<PanelHeaderSubmit onClick={onActiveModalFilters} />}
-          >
+          <CustomModalHeader onCloseClick={onActiveModalFilters} platform={platform}>
             Выбор страны
-          </ModalPageHeader>
+          </CustomModalHeader>
         }
-        className="Overflow"
       >
         <Group>
           <List>
-            {Store.filters.listCountries.length > 0 ? (
-              Store.filters.listCountries.map((country) => (
+            {Store.Filters.listCountries?.length > 0 ? (
+              Store.Filters.listCountries?.map((country) => (
                 <SimpleCell key={country.id} onClick={() => onClickCountry(country)}>
                   {country.title}
                 </SimpleCell>
@@ -218,20 +223,17 @@ const Find = observer(({ id }) => {
         id={MODAL_PAGE_SELECT_CITY}
         onClose={onActiveModalFilters}
         header={
-          <ModalPageHeader
-            left={isMobile && <PanelHeaderClose onClick={onActiveModalFilters} />}
-            right={<PanelHeaderSubmit onClick={onActiveModalFilters} />}
-          >
+          <CustomModalHeader onCloseClick={onActiveModalFilters} platform={platform}>
             Выбор города
-          </ModalPageHeader>
+          </CustomModalHeader>
         }
         className="Overflow"
       >
         <Group>
           <Search value={text} onChange={(e) => setText(e.target.value)} />
           <List>
-            {Store.filters.listCities.length > 0 ? (
-              Store.filters.listCities.map((city) => (
+            {Store.Filters.listCities.length > 0 ? (
+              Store.Filters.listCities.map((city) => (
                 <SimpleCell key={city.id} onClick={() => onClickCity(city)}>
                   {city.title}
                 </SimpleCell>
@@ -242,15 +244,28 @@ const Find = observer(({ id }) => {
           </List>
         </Group>
       </ModalPage>
+      <ModalPage
+        id={MODAL_PAGE_DETAILS}
+        className="Overflow"
+        onClose={onCloseModal}
+        header={
+          <CustomModalHeader onCloseClick={onCloseModal} platform={platform}>
+            Подробнее
+          </CustomModalHeader>
+        }
+      >
+        <Details user={Store.Target.user} />
+      </ModalPage>
     </ModalRoot>
   );
-
+  const go = useMemo(() => ({ forward, back }), [back, forward]);
   return (
-    <View id={id} activePanel={activePanel} modal={modal}>
-      <Main id={PANEL_MAIN} go={go} />
-      <DetailsUser id={PANEL_DETAILS_USER} go={go} />
-      <DetailsGroup id={PANEL_DETAILS_GROUP} go={go} />
-      <SearchPanel id={PANEL_SEARCH} go={go} onClickFilters={onClickFilters} filters={filters} />
+    <View id={id} activePanel={activePanel} modal={modal} popout={popout}>
+      <MainPanel id={PANEL_MAIN} go={go} />
+      <TargetPanel id={PANEL_TARGET} go={go} onClickDetails={onActiveModalDetails} setPopout={setPopout} />
+      <SearchPanel id={PANEL_SEARCH} go={go} onClickFilters={onClickFilters} />
+      <FeedbackPanel id={PANEL_FEEDBACK} go={go} />
+      <CommentPanel id={PANEL_COMMENT} go={go} />
     </View>
   );
 });
