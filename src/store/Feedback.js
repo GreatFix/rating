@@ -1,87 +1,87 @@
-import { makeAutoObservable, when } from 'mobx';
-import BACKEND_API from '../API/backend';
+import { makeAutoObservable, when } from 'mobx'
+import BACKEND_API from '../API/backend'
 
-const CREATE_FEEDBACK = 'createFeedback';
+const CREATE_FEEDBACK = 'createFeedback'
 export default class Feedback {
-  conclusion = '';
-  content = '';
-  images = [];
-  uploadServer = null;
-  validateError = '';
-  sending = false;
-  ready = false;
-  type = CREATE_FEEDBACK;
-  feedbackID = null;
+  conclusion = ''
+  content = ''
+  images = []
+  uploadServer = null
+  validateError = ''
+  sending = false
+  ready = false
+  type = CREATE_FEEDBACK
+  feedbackID = null
   constructor(rootStore) {
-    makeAutoObservable(this);
-    this.rootStore = rootStore;
+    makeAutoObservable(this)
+    this.rootStore = rootStore
   }
 
   get userID() {
-    return this.rootStore.User.userID;
+    return this.rootStore.User.userID
   }
 
   get targetID() {
-    return this.rootStore.Target.id;
+    return this.rootStore.Target.id
   }
   init({ feedbackID = null, conclusion = '', content = '', images = [], type = CREATE_FEEDBACK }) {
-    this.conclusion = conclusion;
-    this.content = content;
-    this.images = images;
-    this.type = type;
-    this.validateError = '';
-    this.sending = false;
-    this.ready = false;
-    this.feedbackID = feedbackID;
+    this.conclusion = conclusion
+    this.content = content
+    this.images = images
+    this.type = type
+    this.validateError = ''
+    this.sending = false
+    this.ready = false
+    this.feedbackID = feedbackID
   }
   clear() {
-    this.conclusion = '';
-    this.content = '';
-    this.images = [];
-    this.type = CREATE_FEEDBACK;
-    this.validateError = '';
-    this.sending = false;
-    this.ready = false;
-    this.feedbackID = null;
+    this.conclusion = ''
+    this.content = ''
+    this.images = []
+    this.type = CREATE_FEEDBACK
+    this.validateError = ''
+    this.sending = false
+    this.ready = false
+    this.feedbackID = null
   }
 
   async request() {
-    await when(() => this.ready);
+    await when(() => this.ready)
     try {
-      let result;
+      let result
       if (this.type === CREATE_FEEDBACK)
-        result = await this.createFeedback(this.targetID, this.content, this.conclusion, this.images);
-      else result = await this.updateFeedback(this.feedbackID, this.content, this.conclusion, this.images);
+        result = await this.createFeedback(this.targetID, this.content, this.conclusion, this.images)
+      else result = await this.updateFeedback(this.feedbackID, this.content, this.conclusion, this.images)
 
-      this.setSending(false);
-      return result;
+      this.setSending(false)
+      return result
     } catch (err) {
-      console.error(err);
+      console.error(err)
     }
   }
 
   setType(type) {
-    this.type = type;
+    this.type = type
   }
 
   setConclusion(conclusion) {
-    this.conclusion = conclusion;
+    this.conclusion = conclusion
   }
   setContent(content) {
-    this.content = content;
+    this.content = content
   }
   setImages(images) {
-    this.images = images;
+    this.images = images
   }
 
   setValidateError(validateError) {
-    this.validateError = validateError;
+    this.validateError = validateError
   }
   setSending(sending) {
-    this.sending = sending;
+    this.sending = sending
   }
   setReady(ready) {
-    this.ready = ready;
+    this.ready = ready
   }
 
   async createFeedback(targetID, content, conclusion, images) {
@@ -89,14 +89,14 @@ export default class Feedback {
       params: {
         userID: this.userID,
       },
-    };
+    }
     const data = {
       targetID,
       content,
       conclusion,
       images,
-    };
-    return await BACKEND_API.POST_FEEDBACK(data, config);
+    }
+    return await BACKEND_API.POST_FEEDBACK(data, config)
   }
 
   async updateFeedback(feedbackId, content, conclusion, images) {
@@ -104,15 +104,15 @@ export default class Feedback {
       params: {
         userID: this.userID,
       },
-    };
+    }
 
     const data = {
       feedbackId: parseInt(feedbackId),
       content,
       conclusion,
       images,
-    };
-    return await BACKEND_API.PUT_FEEDBACK(data, config);
+    }
+    return await BACKEND_API.PUT_FEEDBACK(data, config)
   }
 
   async deleteFeedback(feedbackId) {
@@ -121,7 +121,7 @@ export default class Feedback {
       params: {
         userID: this.userID,
       },
-    };
-    return await BACKEND_API.DELETE_FEEDBACK(config);
+    }
+    return await BACKEND_API.DELETE_FEEDBACK(config)
   }
 }

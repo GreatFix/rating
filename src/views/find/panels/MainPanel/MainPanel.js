@@ -1,60 +1,60 @@
-import React, { useState, useRef, useEffect, useCallback, useContext } from 'react';
-import { Panel, PanelHeader, Tabs, TabsItem, Placeholder, Button, Search } from '@vkontakte/vkui';
-import { Icon56UsersOutline, Icon56ErrorTriangleOutline, Icon56Users3Outline } from '@vkontakte/icons';
-import { observer } from 'mobx-react-lite';
+import React, { useState, useRef, useEffect, useCallback, useContext } from 'react'
+import { Panel, PanelHeader, Tabs, TabsItem, Placeholder, Button, Search } from '@vkontakte/vkui'
+import { Icon56UsersOutline, Icon56ErrorTriangleOutline, Icon56Users3Outline } from '@vkontakte/icons'
+import { observer } from 'mobx-react-lite'
 
-import { StoreContext } from '../../../../store/store';
-import GroupWithList from '../../components/GroupWithList/GroupWithList';
+import { StoreContext } from '../../../../store/store'
+import GroupWithList from '../../components/GroupWithList/GroupWithList'
 
-const PANEL_MAIN = 'PANEL_MAIN';
-const PANEL_SEARCH = 'PANEL_SEARCH';
-const PANEL_TARGET = 'PANEL_TARGET';
-const TAB_FRIENDS = 'fetchFriends';
-const TAB_GROUPS = 'fetchGroups';
-const COUNT = 20;
+const PANEL_MAIN = 'PANEL_MAIN'
+const PANEL_SEARCH = 'PANEL_SEARCH'
+const PANEL_TARGET = 'PANEL_TARGET'
+const TAB_FRIENDS = 'fetchFriends'
+const TAB_GROUPS = 'fetchGroups'
+const COUNT = 20
 
 const MainPanel = observer(({ id, go }) => {
-  const Store = useContext(StoreContext);
-  const [activeTab, setActiveTab] = useState(TAB_FRIENDS);
-  const offset = useRef(0);
-  const scrollHeight = useRef(0);
+  const Store = useContext(StoreContext)
+  const [activeTab, setActiveTab] = useState(TAB_FRIENDS)
+  const offset = useRef(0)
+  const scrollHeight = useRef(0)
   const onScroll = (e) => {
     if (
       e.target.offsetHeight + e.target.scrollTop + 10 >= e.target.scrollHeight &&
       scrollHeight.current !== e.target.scrollHeight
     ) {
-      scrollHeight.current = e.target.scrollHeight;
-      offset.current = offset.current + COUNT;
-      Store.Find[activeTab](offset.current);
+      scrollHeight.current = e.target.scrollHeight
+      offset.current = offset.current + COUNT
+      Store.Find[activeTab](offset.current)
     }
-  };
+  }
 
   const setTabFriends = useCallback((group) => {
-    setActiveTab(TAB_FRIENDS);
-  }, []);
+    setActiveTab(TAB_FRIENDS)
+  }, [])
 
   const setTabGroups = useCallback((group) => {
-    setActiveTab(TAB_GROUPS);
-  }, []);
+    setActiveTab(TAB_GROUPS)
+  }, [])
 
   const onClickTarget = useCallback(
     (target) => {
-      Store.Target.setId(target.id);
-      go.forward(PANEL_MAIN, PANEL_TARGET);
+      Store.Target.setId(target.id)
+      go.forward(PANEL_MAIN, PANEL_TARGET)
     },
     [Store.Target, go]
-  );
+  )
 
   const goSearchPanel = useCallback(() => {
-    go.forward(PANEL_MAIN, PANEL_SEARCH);
-  }, [go]);
+    go.forward(PANEL_MAIN, PANEL_SEARCH)
+  }, [go])
 
   useEffect(() => {
-    offset.current = 0;
-    Store.Find[activeTab]();
-  }, [Store.Find, activeTab, Store.User.access_token]);
+    offset.current = 0
+    Store.Find[activeTab]()
+  }, [Store.Find, activeTab, Store.User.access_token])
 
-  useEffect(() => () => Store.Find.clearFetchedInfo(), [Store.Find]);
+  useEffect(() => () => Store.Find.clearFetchedInfo(), [Store.Find])
 
   return (
     <Panel id={id} onScroll={onScroll} className="Overflow">
@@ -97,7 +97,7 @@ const MainPanel = observer(({ id, go }) => {
         </Placeholder>
       )}
     </Panel>
-  );
-});
+  )
+})
 
-export default MainPanel;
+export default MainPanel

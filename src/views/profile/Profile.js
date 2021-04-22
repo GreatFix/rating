@@ -1,10 +1,10 @@
 /* eslint-disable no-unused-vars */
-import React, { useContext } from 'react';
-import { View, Panel, PanelHeader, PanelHeaderBack, Group } from '@vkontakte/vkui';
+import React, { useContext } from 'react'
+import { View, Panel, PanelHeader, PanelHeaderBack, Group } from '@vkontakte/vkui'
 
-import { StoreContext } from '../../store/store';
+import { StoreContext } from '../../store/store'
 const Profile = (props) => {
-  const Store = useContext(StoreContext);
+  const Store = useContext(StoreContext)
 
   return (
     <View id="profile" activePanel="profile">
@@ -13,7 +13,7 @@ const Profile = (props) => {
         <Group style={{ height: '1000px' }}></Group>
       </Panel>
     </View>
-  );
-};
+  )
+}
 
-export default Profile;
+export default Profile

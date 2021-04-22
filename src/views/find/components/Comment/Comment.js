@@ -1,39 +1,39 @@
-import React, { useCallback } from 'react';
-import { RichCell, Avatar, Card, CardGrid, Spacing } from '@vkontakte/vkui';
-import { DateTime } from 'luxon';
-import classes from './Comment.module.css';
-import { observer } from 'mobx-react-lite';
+import React, { useCallback } from 'react'
+import { RichCell, Avatar, Card, CardGrid, Spacing } from '@vkontakte/vkui'
+import { DateTime } from 'luxon'
+import classes from './Comment.module.css'
+import { observer } from 'mobx-react-lite'
 
 const Comment = observer(({ comment, feedbackIndex, commentIndex, onClickReply, onClickImage, onClick }) => {
   const handleClickReply = useCallback(
     (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      onClickReply(comment?.FeedbackId, comment?.first_name, comment?.UserId);
+      e.preventDefault()
+      e.stopPropagation()
+      onClickReply(comment?.FeedbackId, comment?.first_name, comment?.UserId)
     },
     [comment?.FeedbackId, comment?.UserId, comment?.first_name, onClickReply]
-  );
+  )
 
   const handleClickImage = useCallback(
     (e) => {
-      e.stopPropagation();
-      const imageIndex = e.target.dataset.index;
-      onClickImage(feedbackIndex, commentIndex, imageIndex);
+      e.stopPropagation()
+      const imageIndex = e.target.dataset.index
+      onClickImage(feedbackIndex, commentIndex, imageIndex)
     },
     [commentIndex, feedbackIndex, onClickImage]
-  );
+  )
 
   const handleClickComment = useCallback(
     (e) => {
-      e.stopPropagation();
-      onClick(comment?.id, feedbackIndex);
+      e.stopPropagation()
+      onClick(comment?.id, feedbackIndex)
     },
     [comment?.id, feedbackIndex, onClick]
-  );
+  )
 
   const handleClickGreeting = useCallback((e) => {
-    e.stopPropagation();
-  }, []);
+    e.stopPropagation()
+  }, [])
 
   return (
     <>
@@ -82,7 +82,7 @@ const Comment = observer(({ comment, feedbackIndex, commentIndex, onClickReply, 
         </RichCell>
       </Card>
     </>
-  );
-});
+  )
+})
 
-export default Comment;
+export default Comment

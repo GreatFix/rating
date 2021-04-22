@@ -1,13 +1,13 @@
-import React from 'react';
-import { Separator, MiniInfoCell, UsersStack } from '@vkontakte/vkui';
+import React from 'react'
+import { Separator, MiniInfoCell, UsersStack } from '@vkontakte/vkui'
 import {
   Icon20LockOutline,
   Icon20HomeOutline,
   Icon20MentionOutline,
   Icon20MessageOutline,
   Icon20UsersOutline,
-} from '@vkontakte/icons';
-import { observer } from 'mobx-react-lite';
+} from '@vkontakte/icons'
+import { observer } from 'mobx-react-lite'
 
 const Details = observer(({ user }) => {
   return (
@@ -42,7 +42,7 @@ const Details = observer(({ user }) => {
 
       {user.data?.is_closed && <MiniInfoCell before={<Icon20LockOutline />}>Закрытый профиль</MiniInfoCell>}
     </>
-  );
-});
+  )
+})
 
-export default Details;
+export default Details

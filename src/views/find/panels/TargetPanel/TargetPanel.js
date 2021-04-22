@@ -1,5 +1,5 @@
-import React, { useCallback, useContext, useEffect } from 'react';
-import { observer } from 'mobx-react-lite';
+import React, { useCallback, useContext, useEffect } from 'react'
+import { observer } from 'mobx-react-lite'
 import {
   Avatar,
   CellButton,
@@ -20,7 +20,7 @@ import {
   ActionSheetItem,
   IOS,
   usePlatform,
-} from '@vkontakte/vkui';
+} from '@vkontakte/vkui'
 import {
   Icon20Info,
   Icon28AddOutline,
@@ -29,24 +29,24 @@ import {
   Icon28DeleteOutline,
   Icon28DeleteOutlineAndroid,
   Icon28EditOutline,
-} from '@vkontakte/icons';
-import { StoreContext } from '../../../../store/store';
-import classes from './TargetPanel.module.css';
-import Popular from '../../components/Popular/Popular';
-import Feedback from '../../components/Feedback/Feedback';
-import CommentList from '../../components/CommentList/CommentList';
-import CustomWriteBar from '../../components/CustomWriteBar/CustomWriteBar';
+} from '@vkontakte/icons'
+import { StoreContext } from '../../../../store/store'
+import classes from './TargetPanel.module.css'
+import Popular from '../../components/Popular/Popular'
+import Feedback from '../../components/Feedback/Feedback'
+import CommentList from '../../components/CommentList/CommentList'
+import CustomWriteBar from '../../components/CustomWriteBar/CustomWriteBar'
 
-const PANEL_TARGET = 'PANEL_TARGET';
-const PANEL_FEEDBACK = 'PANEL_FEEDBACK';
-const PANEL_COMMENT = 'PANEL_COMMENT';
-const CREATE_FEEDBACK = 'createFeedback';
-const UPDATE_FEEDBACK = 'updateFeedback';
-const UPDATE_COMMENT = 'updateComment';
+const PANEL_TARGET = 'PANEL_TARGET'
+const PANEL_FEEDBACK = 'PANEL_FEEDBACK'
+const PANEL_COMMENT = 'PANEL_COMMENT'
+const CREATE_FEEDBACK = 'createFeedback'
+const UPDATE_FEEDBACK = 'updateFeedback'
+const UPDATE_COMMENT = 'updateComment'
 
 const TargetPanel = observer(({ id, go, onClickDetails, setPopout }) => {
-  const Store = useContext(StoreContext);
-  const platform = usePlatform();
+  const Store = useContext(StoreContext)
+  const platform = usePlatform()
 
   const handleClickFeedbackImage = useCallback(
     (feedbackIndex, imageIndex) => {
@@ -65,42 +65,42 @@ const TargetPanel = observer(({ id, go, onClickDetails, setPopout }) => {
             ))}
           </Gallery>
         </PopoutWrapper>
-      );
+      )
     },
     [Store.Target.feedbacks?.data?.Feedbacks, setPopout]
-  );
+  )
 
   const handleClickAddFeedback = useCallback(() => {
-    go.forward(PANEL_TARGET, PANEL_FEEDBACK);
-    Store.Feedback.init({ type: CREATE_FEEDBACK });
-  }, [Store.Feedback, go]);
+    go.forward(PANEL_TARGET, PANEL_FEEDBACK)
+    Store.Feedback.init({ type: CREATE_FEEDBACK })
+  }, [Store.Feedback, go])
 
   const handleClickEditFeedback = useCallback(
     (id) => {
-      go.forward(PANEL_TARGET, PANEL_FEEDBACK);
-      const feedback = Store.Target.feedbacks?.data?.Feedbacks?.find((feedback) => feedback.id === id);
+      go.forward(PANEL_TARGET, PANEL_FEEDBACK)
+      const feedback = Store.Target.feedbacks?.data?.Feedbacks?.find((feedback) => feedback.id === id)
       Store.Feedback.init({
         type: UPDATE_FEEDBACK,
         conclusion: feedback.conclusion,
         images: feedback.images,
         content: feedback.content,
         feedbackID: id,
-      });
+      })
     },
     [Store.Feedback, Store.Target.feedbacks?.data?.Feedbacks, go]
-  );
+  )
 
   const handleClickDeleteFeedback = useCallback(
     async (id) => {
       try {
-        const result = await Store.Feedback.deleteFeedback(id);
-        if (result) Store.Target.popFeedback(id);
+        const result = await Store.Feedback.deleteFeedback(id)
+        if (result) Store.Target.popFeedback(id)
       } catch (err) {
-        console.error(err);
+        console.error(err)
       }
     },
     [Store.Feedback, Store.Target]
-  );
+  )
 
   const handleClickFeedback = useCallback(
     (id) => {
@@ -125,10 +125,10 @@ const TargetPanel = observer(({ id, go, onClickDetails, setPopout }) => {
             Удалить
           </ActionSheetItem>
         </ActionSheet>
-      );
+      )
     },
     [handleClickDeleteFeedback, handleClickEditFeedback, platform, setPopout]
-  );
+  )
 
   const handleClickCommentImage = useCallback(
     (feedbackIndex, commentIndex, imageIndex) => {
@@ -149,10 +149,10 @@ const TargetPanel = observer(({ id, go, onClickDetails, setPopout }) => {
             )}
           </Gallery>
         </PopoutWrapper>
-      );
+      )
     },
     [Store.Target.feedbacks.data?.Feedbacks, setPopout]
-  );
+  )
 
   const handleClickReply = useCallback(
     (feedbackId, greetingName, greetingID) => {
@@ -161,39 +161,39 @@ const TargetPanel = observer(({ id, go, onClickDetails, setPopout }) => {
         greetingName,
         greetingID,
         content: `${greetingName}, `,
-      });
-      Store.Target.setReply(true);
+      })
+      Store.Target.setReply(true)
     },
     [Store.Comment, Store.Target]
-  );
+  )
 
   const handleClickEditComment = useCallback(
     (id, feedbackIndex) => {
-      go.forward(PANEL_TARGET, PANEL_COMMENT);
+      go.forward(PANEL_TARGET, PANEL_COMMENT)
       const comment = Store.Target.feedbacks?.data?.Feedbacks[feedbackIndex]?.Comments?.find(
         (comment) => comment.id === id
-      );
+      )
       Store.Comment.init({
         type: UPDATE_COMMENT,
         images: comment.images,
         content: comment.content,
         commentID: id,
-      });
+      })
     },
     [Store.Comment, Store.Target.feedbacks?.data?.Feedbacks, go]
-  );
+  )
 
   const handleClickDeleteComment = useCallback(
     async (id, feedbackIndex) => {
       try {
-        const result = await Store.Comment.deleteComment(id);
-        if (result) Store.Target.popComment(id, feedbackIndex);
+        const result = await Store.Comment.deleteComment(id)
+        if (result) Store.Target.popComment(id, feedbackIndex)
       } catch (err) {
-        console.error(err);
+        console.error(err)
       }
     },
     [Store.Comment, Store.Target]
-  );
+  )
 
   const handleClickComment = useCallback(
     (id, feedbackIndex) => {
@@ -222,15 +222,15 @@ const TargetPanel = observer(({ id, go, onClickDetails, setPopout }) => {
             Удалить
           </ActionSheetItem>
         </ActionSheet>
-      );
+      )
     },
     [handleClickDeleteComment, handleClickEditComment, platform, setPopout]
-  );
+  )
 
   useEffect(() => {
-    Store.Target.getInfo();
-    return () => Store.Target.TargetClear();
-  }, [Store.Target]);
+    Store.Target.getInfo()
+    return () => Store.Target.TargetClear()
+  }, [Store.Target])
 
   return (
     <Panel id={id} className={'Overflow'}>
@@ -301,7 +301,7 @@ const TargetPanel = observer(({ id, go, onClickDetails, setPopout }) => {
         {Store.Target?.reply && <CustomWriteBar comment={Store.Comment} />}
       </Group>
     </Panel>
-  );
-});
+  )
+})
 
-export default TargetPanel;
+export default TargetPanel

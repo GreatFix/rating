@@ -1,6 +1,6 @@
-import React from 'react';
-import { ModalPageHeader, PanelHeaderButton, VKCOM, IOS, ANDROID } from '@vkontakte/vkui';
-import { Icon24Cancel, Icon24Dismiss } from '@vkontakte/icons';
+import React from 'react'
+import { ModalPageHeader, PanelHeaderButton, VKCOM, IOS, ANDROID } from '@vkontakte/vkui'
+import { Icon24Cancel, Icon24Dismiss } from '@vkontakte/icons'
 const CustomModalHeader = (props) => (
   <ModalPageHeader
     left={
@@ -20,6 +20,6 @@ const CustomModalHeader = (props) => (
   >
     {props.children}
   </ModalPageHeader>
-);
+)
 
-export default React.memo(CustomModalHeader);
+export default React.memo(CustomModalHeader)

@@ -1,34 +1,34 @@
-import React, { useState, useEffect } from 'react';
-import bridge from '@vkontakte/vk-bridge';
-import { Epic, Tabbar, TabbarItem } from '@vkontakte/vkui';
-import { AdaptivityProvider, AppRoot } from '@vkontakte/vkui';
-import '@vkontakte/vkui/dist/vkui.css';
-import { Icon20Search, Icon24Chats, Icon24UserOutline } from '@vkontakte/icons';
+import React, { useState, useEffect } from 'react'
+import bridge from '@vkontakte/vk-bridge'
+import { Epic, Tabbar, TabbarItem } from '@vkontakte/vkui'
+import { AdaptivityProvider, AppRoot } from '@vkontakte/vkui'
+import '@vkontakte/vkui/dist/vkui.css'
+import { Icon20Search, Icon24Chats, Icon24UserOutline } from '@vkontakte/icons'
 
-import Find from './views/find/Find';
-import Reviews from './views/reviews/Reviews';
-import Profile from './views/profile/Profile';
+import Find from './views/find/Find'
+import Reviews from './views/reviews/Reviews'
+import Profile from './views/profile/Profile'
 
-import { observer } from 'mobx-react-lite';
+import { observer } from 'mobx-react-lite'
 
-import './App.css';
+import './App.css'
 
-const FIND = 'FIND';
-const PROFILE = 'PROFILE';
-const REVIEWS = 'REVIEWS';
+const FIND = 'FIND'
+const PROFILE = 'PROFILE'
+const REVIEWS = 'REVIEWS'
 
 const App = observer(() => {
-  const [activeStory, setActiveStory] = useState(PROFILE);
+  const [activeStory, setActiveStory] = useState(PROFILE)
 
   useEffect(() => {
     bridge.subscribe(({ detail: { type, data } }) => {
       if (type === 'VKWebAppUpdateConfig') {
-        const schemeAttribute = document.createAttribute('scheme');
-        schemeAttribute.value = data.scheme ? data.scheme : 'client_light';
-        document.body.attributes.setNamedItem(schemeAttribute);
+        const schemeAttribute = document.createAttribute('scheme')
+        schemeAttribute.value = data.scheme ? data.scheme : 'client_light'
+        document.body.attributes.setNamedItem(schemeAttribute)
       }
-    });
-  }, []);
+    })
+  }, [])
 
   return (
     <AdaptivityProvider>
@@ -39,7 +39,7 @@ const App = observer(() => {
             <Tabbar>
               <TabbarItem
                 onClick={() => {
-                  setActiveStory(FIND);
+                  setActiveStory(FIND)
                 }}
                 selected={activeStory === FIND}
                 data-story={FIND}
@@ -49,7 +49,7 @@ const App = observer(() => {
               </TabbarItem>
               <TabbarItem
                 onClick={() => {
-                  setActiveStory(REVIEWS);
+                  setActiveStory(REVIEWS)
                 }}
                 selected={activeStory === REVIEWS}
                 data-story={REVIEWS}
@@ -59,7 +59,7 @@ const App = observer(() => {
               </TabbarItem>
               <TabbarItem
                 onClick={() => {
-                  setActiveStory(PROFILE);
+                  setActiveStory(PROFILE)
                 }}
                 selected={activeStory === PROFILE}
                 data-story={PROFILE}
@@ -77,7 +77,7 @@ const App = observer(() => {
         </Epic>
       </AppRoot>
     </AdaptivityProvider>
-  );
-});
+  )
+})
 
-export default App;
+export default App

@@ -1,7 +1,7 @@
-import React from 'react';
-import { RichCell, Avatar, Counter } from '@vkontakte/vkui';
-import { observer } from 'mobx-react-lite';
-import './UserCell.css';
+import React from 'react'
+import { RichCell, Avatar, Counter } from '@vkontakte/vkui'
+import { observer } from 'mobx-react-lite'
+import './UserCell.css'
 
 const UserCell = observer(({ user, onClick }) => (
   <RichCell
@@ -23,6 +23,6 @@ const UserCell = observer(({ user, onClick }) => (
   >
     {`${user.first_name} ${user.last_name}`}
   </RichCell>
-));
+))
 
-export default UserCell;
+export default UserCell

@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 const AXIOS = axios.create({
-  baseURL: 'https://rating-backend.herokuapp.com/'
+  baseURL: 'https://rating-backend.herokuapp.com/',
 })
 
 class BACKEND_API {

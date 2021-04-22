@@ -1,7 +1,7 @@
-import React from 'react';
-import { RichCell, Avatar, Counter } from '@vkontakte/vkui';
-import './GroupCell.css';
-import { observer } from 'mobx-react-lite';
+import React from 'react'
+import { RichCell, Avatar, Counter } from '@vkontakte/vkui'
+import './GroupCell.css'
+import { observer } from 'mobx-react-lite'
 
 const GroupCell = observer(({ group, onClick }) => (
   <RichCell
@@ -22,6 +22,6 @@ const GroupCell = observer(({ group, onClick }) => (
   >
     {`${group.name}`}
   </RichCell>
-));
+))
 
-export default GroupCell;
+export default GroupCell

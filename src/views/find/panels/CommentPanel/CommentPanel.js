@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useContext } from 'react';
+import React, { useCallback, useEffect, useContext } from 'react'
 import {
   FormLayout,
   Group,
@@ -13,74 +13,74 @@ import {
   Panel,
   PanelHeader,
   PanelHeaderBack,
-} from '@vkontakte/vkui';
-import { Icon24Camera } from '@vkontakte/icons';
-import { StoreContext } from '../../../../store/store';
-import { observer } from 'mobx-react-lite';
-import Preview from '../../components/Preview/Preview';
-const COUNT_IMAGES = 2;
+} from '@vkontakte/vkui'
+import { Icon24Camera } from '@vkontakte/icons'
+import { StoreContext } from '../../../../store/store'
+import { observer } from 'mobx-react-lite'
+import Preview from '../../components/Preview/Preview'
+const COUNT_IMAGES = 2
 
 const CommentPanel = observer(({ id, go }) => {
-  const Store = useContext(StoreContext);
+  const Store = useContext(StoreContext)
 
   useEffect(() => {
-    (async function () {
-      await Store.Comment.request();
-      go.back();
-    })();
+    ;(async function () {
+      await Store.Comment.request()
+      go.back()
+    })()
 
-    return () => Store.Comment.clear();
-  }, [Store.Comment, go]);
+    return () => Store.Comment.clear()
+  }, [Store.Comment, go])
 
   const onChangeContent = useCallback(
     (e) => {
-      Store.Comment.setContent(e.target.value);
+      Store.Comment.setContent(e.target.value)
     },
     [Store.Comment]
-  );
+  )
 
   const onChangeImages = useCallback(
     (e) => {
       Array.from(e.target.files).forEach((file, index) => {
         if (!file.type.match('image')) {
-          return;
+          return
         }
-        const reader = new FileReader();
+        const reader = new FileReader()
 
         reader.onload = (e) => {
-          const src = e.target.result;
-          Store.Comment.setImages([...Store.Comment.images, src]);
-        };
+          const src = e.target.result
+          Store.Comment.setImages([...Store.Comment.images, src])
+        }
 
-        reader.readAsDataURL(file);
-      });
+        reader.readAsDataURL(file)
+      })
     },
     [Store.Comment]
-  );
+  )
 
   const handleClickRemoveImage = useCallback(
     (e) => {
       if (e.target.dataset.id) {
-        Store.Comment.setImages(Store.Comment.images.filter((img) => img.id !== parseInt(e.target.dataset.id)));
+        Store.Comment.setImages(Store.Comment.images.filter((img) => img.id !== parseInt(e.target.dataset.id)))
       } else {
-        Store.Comment.setImages(Store.Comment.images.filter((src) => src !== e.target.dataset.src));
+        Store.Comment.setImages(Store.Comment.images.filter((src) => src !== e.target.dataset.src))
       }
     },
     [Store.Comment]
-  );
+  )
 
   const handleClickSubmitComment = useCallback(
     (e) => {
-      e.preventDefault();
+      e.preventDefault()
       if (Store.Comment.images.length > COUNT_IMAGES)
-        return Store.Comment.setValidateError('Превышено количество изображений');
-      if (Store.Comment.content.length > 1000) return Store.Comment.setValidateError('Превышено количество символов');
-      Store.Comment.setValidateError('');
-      Store.Comment.setSending(true);
-      Store.Comment.setReady(true);
+        return Store.Comment.setValidateError('Превышено количество изображений')
+      if (Store.Comment.content.length > 1000) return Store.Comment.setValidateError('Превышено количество символов')
+      Store.Comment.setValidateError('')
+      Store.Comment.setSending(true)
+      Store.Comment.setReady(true)
     },
     [Store.Comment]
-  );
+  )
 
   return (
     <Panel id={id} className="Overflow">
@@ -146,7 +146,7 @@ const CommentPanel = observer(({ id, go }) => {
         </FormLayout>
       </Group>
     </Panel>
-  );
-});
+  )
+})
 
-export default CommentPanel;
+export default CommentPanel

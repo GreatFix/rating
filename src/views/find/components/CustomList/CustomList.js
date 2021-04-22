@@ -1,8 +1,8 @@
-import React from 'react';
-import { List } from '@vkontakte/vkui';
-import UserCell from '../UserCell/UserCell';
-import GroupCell from '../GroupCell/GroupCell';
-import { observer } from 'mobx-react-lite';
+import React from 'react'
+import { List } from '@vkontakte/vkui'
+import UserCell from '../UserCell/UserCell'
+import GroupCell from '../GroupCell/GroupCell'
+import { observer } from 'mobx-react-lite'
 
 const CustomList = observer(({ array, onClick, cellType = 'UserCell' }) => (
   <List>
@@ -14,6 +14,6 @@ const CustomList = observer(({ array, onClick, cellType = 'UserCell' }) => (
       )
     )}
   </List>
-));
+))
 
-export default CustomList;
+export default CustomList

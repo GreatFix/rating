@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useContext } from 'react';
+import React, { useCallback, useEffect, useContext } from 'react'
 import {
   SliderSwitch,
   FormLayout,
@@ -14,86 +14,86 @@ import {
   Panel,
   PanelHeader,
   PanelHeaderBack,
-} from '@vkontakte/vkui';
-import { Icon24Camera } from '@vkontakte/icons';
-import { StoreContext } from '../../../../store/store';
-import { observer } from 'mobx-react-lite';
-import Preview from '../../components/Preview/Preview';
-const CREATE_FEEDBACK = 'createFeedback';
-const COUNT_IMAGES = 10;
+} from '@vkontakte/vkui'
+import { Icon24Camera } from '@vkontakte/icons'
+import { StoreContext } from '../../../../store/store'
+import { observer } from 'mobx-react-lite'
+import Preview from '../../components/Preview/Preview'
+const CREATE_FEEDBACK = 'createFeedback'
+const COUNT_IMAGES = 10
 const FeedbackPanel = observer(({ id, go }) => {
-  const Store = useContext(StoreContext);
+  const Store = useContext(StoreContext)
 
   useEffect(() => {
-    (async function () {
-      await Store.Feedback.request();
-      go.back();
-    })();
+    ;(async function () {
+      await Store.Feedback.request()
+      go.back()
+    })()
 
-    return () => Store.Feedback.clear();
+    return () => Store.Feedback.clear()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [])
 
   const onSwitchConclusion = useCallback(
     (value) => {
-      Store.Feedback.setConclusion(value);
+      Store.Feedback.setConclusion(value)
     },
     [Store.Feedback]
-  );
+  )
 
   const onChangeContent = useCallback(
     (e) => {
-      Store.Feedback.setContent(e.target.value);
+      Store.Feedback.setContent(e.target.value)
     },
     [Store.Feedback]
-  );
+  )
 
   const onChangeImages = useCallback(
     (e) => {
       Array.from(e.target.files).forEach((file, index) => {
         if (!file.type.match('image')) {
-          return;
+          return
         }
-        const reader = new FileReader();
+        const reader = new FileReader()
 
         reader.onload = (e) => {
-          const src = e.target.result;
-          Store.Feedback.setImages([...Store.Feedback.images, src]);
-        };
+          const src = e.target.result
+          Store.Feedback.setImages([...Store.Feedback.images, src])
+        }
 
-        reader.readAsDataURL(file);
-      });
+        reader.readAsDataURL(file)
+      })
     },
     [Store.Feedback]
-  );
+  )
 
   const handleClickRemoveImage = useCallback(
     (e) => {
       if (e.target.dataset.id) {
-        console.log(e.target.dataset.id);
-        Store.Feedback.setImages(Store.Feedback.images.filter((img) => img.id !== parseInt(e.target.dataset.id)));
+        console.log(e.target.dataset.id)
+        Store.Feedback.setImages(Store.Feedback.images.filter((img) => img.id !== parseInt(e.target.dataset.id)))
       } else {
-        Store.Feedback.setImages(Store.Feedback.images.filter((src) => src !== e.target.dataset.src));
+        Store.Feedback.setImages(Store.Feedback.images.filter((src) => src !== e.target.dataset.src))
       }
     },
     [Store.Feedback]
-  );
+  )
 
   const handleClickSubmitFeedback = useCallback(
     (e) => {
-      e.preventDefault();
+      e.preventDefault()
       if (Store.Feedback.images.length > COUNT_IMAGES)
-        return Store.Feedback.setValidateError('Превышено количество изображений');
-      if (Store.Feedback.content.length > 1000) return Store.Feedback.setValidateError('Превышено количество символов');
+        return Store.Feedback.setValidateError('Превышено количество изображений')
+      if (Store.Feedback.content.length > 1000) return Store.Feedback.setValidateError('Превышено количество символов')
       if (Store.Feedback.conclusion !== 'positive' && Store.Feedback.conclusion !== 'negative')
-        return Store.Feedback.setValidateError('Выберите тип отзыва');
-      Store.Feedback.setValidateError('');
+        return Store.Feedback.setValidateError('Выберите тип отзыва')
+      Store.Feedback.setValidateError('')
 
-      Store.Feedback.setSending(true);
-      Store.Feedback.setReady(true);
+      Store.Feedback.setSending(true)
+      Store.Feedback.setReady(true)
     },
     [Store.Feedback]
-  );
+  )
 
   return (
     <Panel id={id} className="Overflow">
@@ -180,7 +180,7 @@ const FeedbackPanel = observer(({ id, go }) => {
         </FormLayout>
       </Group>
     </Panel>
-  );
-});
+  )
+})
 
-export default FeedbackPanel;
+export default FeedbackPanel

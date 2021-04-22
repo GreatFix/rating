@@ -1,42 +1,42 @@
-import React, { useCallback } from 'react';
-import { RichCell, Avatar, Card, CardScroll } from '@vkontakte/vkui';
-import { Icon16CommentOutline } from '@vkontakte/icons';
-import { DateTime } from 'luxon';
-import classes from './Feedback.module.css';
-import { observer } from 'mobx-react-lite';
+import React, { useCallback } from 'react'
+import { RichCell, Avatar, Card, CardScroll } from '@vkontakte/vkui'
+import { Icon16CommentOutline } from '@vkontakte/icons'
+import { DateTime } from 'luxon'
+import classes from './Feedback.module.css'
+import { observer } from 'mobx-react-lite'
 
 const COLORS = {
   neutral: '#99A2AD',
   positive: '#47C147',
   negative: '#FF3D50',
-};
+}
 
 const Feedback = observer(({ feedback, feedbackIndex, onClickReply, onClickImage, onClick }) => {
   const handleClickReply = useCallback(
     (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      onClickReply(feedback?.id, feedback?.first_name, feedback?.UserId);
+      e.preventDefault()
+      e.stopPropagation()
+      onClickReply(feedback?.id, feedback?.first_name, feedback?.UserId)
     },
     [feedback?.id, feedback?.UserId, feedback?.first_name, onClickReply]
-  );
+  )
 
   const handleClickImage = useCallback(
     (e) => {
-      e.stopPropagation();
-      const imageIndex = e.target.dataset.index;
-      onClickImage(feedbackIndex, imageIndex);
+      e.stopPropagation()
+      const imageIndex = e.target.dataset.index
+      onClickImage(feedbackIndex, imageIndex)
     },
     [feedbackIndex, onClickImage]
-  );
+  )
 
   const handleClickFeedback = useCallback(
     (e) => {
-      e.stopPropagation();
-      onClick(feedback?.id);
+      e.stopPropagation()
+      onClick(feedback?.id)
     },
     [feedback?.id, onClick]
-  );
+  )
 
   return (
     <Card mode="shadow">
@@ -71,7 +71,7 @@ const Feedback = observer(({ feedback, feedbackIndex, onClickReply, onClickImage
         {feedback?.last_name} {feedback?.first_name}
       </RichCell>
     </Card>
-  );
-});
+  )
+})
 
-export default Feedback;
+export default Feedback

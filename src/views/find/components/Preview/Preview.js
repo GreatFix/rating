@@ -1,7 +1,7 @@
-import React from 'react';
-import { Avatar, Card } from '@vkontakte/vkui';
-import './Preview.css';
-import { observer } from 'mobx-react-lite';
+import React from 'react'
+import { Avatar, Card } from '@vkontakte/vkui'
+import './Preview.css'
+import { observer } from 'mobx-react-lite'
 
 const Preview = observer(({ img, index, maxCount, onClickRemove, size }) => {
   return img?.id ? (
@@ -20,7 +20,7 @@ const Preview = observer(({ img, index, maxCount, onClickRemove, size }) => {
       </div>
       {index > maxCount - 1 && <div className="Preview--error">Не более {maxCount} файлов</div>}
     </Card>
-  );
-});
+  )
+})
 
-export default Preview;
+export default Preview

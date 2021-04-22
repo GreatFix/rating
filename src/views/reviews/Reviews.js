@@ -1,5 +1,5 @@
-import React from 'react';
-import { View, Panel, PanelHeader, PanelHeaderBack, Group } from '@vkontakte/vkui';
+import React from 'react'
+import { View, Panel, PanelHeader, PanelHeaderBack, Group } from '@vkontakte/vkui'
 const Reviews = (props) => {
   return (
     <View id="reviews" activePanel="reviews">
@@ -8,7 +8,7 @@ const Reviews = (props) => {
         <Group style={{ height: '1000px' }}></Group>
       </Panel>
     </View>
-  );
-};
+  )
+}
 
-export default Reviews;
+export default Reviews

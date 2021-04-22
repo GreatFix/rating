@@ -1,7 +1,7 @@
-import React from 'react';
-import classes from './CommentList.module.css';
-import Comment from '../Comment/Comment';
-import { List } from '@vkontakte/vkui';
+import React from 'react'
+import classes from './CommentList.module.css'
+import Comment from '../Comment/Comment'
+import { List } from '@vkontakte/vkui'
 
 const CommentList = ({ comments = [], feedbackIndex, onClickComment, onClickImage, onClickReply }) => {
   return (
@@ -18,7 +18,7 @@ const CommentList = ({ comments = [], feedbackIndex, onClickComment, onClickImag
         />
       ))}
     </List>
-  );
-};
+  )
+}
 
-export default CommentList;
+export default CommentList

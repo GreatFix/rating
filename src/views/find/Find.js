@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState, useContext, useRef, useMemo } from 'react';
+import React, { useCallback, useEffect, useState, useContext, useRef, useMemo } from 'react'
 import {
   View,
   ModalRoot,
@@ -16,121 +16,121 @@ import {
   PanelHeaderButton,
   Button,
   usePlatform,
-} from '@vkontakte/vkui';
-import { Icon24HomeOutline, Icon28RefreshOutline, Icon16Globe } from '@vkontakte/icons';
-import { observer } from 'mobx-react-lite';
-import MainPanel from './panels/MainPanel/MainPanel';
-import TargetPanel from './panels/TargetPanel/TargetPanel';
-import FeedbackPanel from './panels/FeedbackPanel/FeedbackPanel';
-import CommentPanel from './panels/CommentPanel/CommentPanel';
-import SearchPanel from './panels/SearchPanel/SearchPanel';
-import Slider from './components/Slider/Slider';
+} from '@vkontakte/vkui'
+import { Icon24HomeOutline, Icon28RefreshOutline, Icon16Globe } from '@vkontakte/icons'
+import { observer } from 'mobx-react-lite'
+import MainPanel from './panels/MainPanel/MainPanel'
+import TargetPanel from './panels/TargetPanel/TargetPanel'
+import FeedbackPanel from './panels/FeedbackPanel/FeedbackPanel'
+import CommentPanel from './panels/CommentPanel/CommentPanel'
+import SearchPanel from './panels/SearchPanel/SearchPanel'
+import Slider from './components/Slider/Slider'
 
-import CustomModalHeader from './components/CustomModalHeader/CustomModalHeader';
-import CustomSliderSwitch from './components/SliderSwitch/SliderSwitch';
-import { StoreContext } from '../../store/store';
-import Details from './components/Details/Details';
-import History from '../../utils/history';
+import CustomModalHeader from './components/CustomModalHeader/CustomModalHeader'
+import CustomSliderSwitch from './components/SliderSwitch/SliderSwitch'
+import { StoreContext } from '../../store/store'
+import Details from './components/Details/Details'
+import History from '../../utils/history'
 
-const PANEL_TARGET = 'PANEL_TARGET';
-const PANEL_MAIN = 'PANEL_MAIN';
-const PANEL_SEARCH = 'PANEL_SEARCH';
-const PANEL_FEEDBACK = 'PANEL_FEEDBACK';
-const PANEL_COMMENT = 'PANEL_COMMENT';
+const PANEL_TARGET = 'PANEL_TARGET'
+const PANEL_MAIN = 'PANEL_MAIN'
+const PANEL_SEARCH = 'PANEL_SEARCH'
+const PANEL_FEEDBACK = 'PANEL_FEEDBACK'
+const PANEL_COMMENT = 'PANEL_COMMENT'
 
-const MODAL_PAGE_FILTERS = 'MODAL_PAGE_FILTERS';
-const MODAL_PAGE_SELECT_COUNTRY = 'MODAL_PAGE_SELECT_COUNTRY';
-const MODAL_PAGE_SELECT_CITY = 'MODAL_PAGE_SELECT_CITY';
-const MODAL_PAGE_DETAILS = 'MODAL_PAGE_DETAILS';
+const MODAL_PAGE_FILTERS = 'MODAL_PAGE_FILTERS'
+const MODAL_PAGE_SELECT_COUNTRY = 'MODAL_PAGE_SELECT_COUNTRY'
+const MODAL_PAGE_SELECT_CITY = 'MODAL_PAGE_SELECT_CITY'
+const MODAL_PAGE_DETAILS = 'MODAL_PAGE_DETAILS'
 
 const Find = observer(({ id }) => {
-  const Store = useContext(StoreContext);
-  const platform = usePlatform();
-  const [activePanel, setActivePanel] = useState(PANEL_MAIN);
-  const [activeModal, setActiveModal] = useState(null);
-  const [popout, setPopout] = useState(null);
-  const [text, setText] = useState('');
-  const [ageSlider, setAgeSlider] = useState({ age_from: 14, age_to: 80 });
-  const debouncedSetAge = useRef();
+  const Store = useContext(StoreContext)
+  const platform = usePlatform()
+  const [activePanel, setActivePanel] = useState(PANEL_MAIN)
+  const [activeModal, setActiveModal] = useState(null)
+  const [popout, setPopout] = useState(null)
+  const [text, setText] = useState('')
+  const [ageSlider, setAgeSlider] = useState({ age_from: 14, age_to: 80 })
+  const debouncedSetAge = useRef()
 
   const forward = useCallback((prev, next) => {
-    setActivePanel(next);
-    History.add(prev);
-  }, []);
+    setActivePanel(next)
+    History.add(prev)
+  }, [])
 
   const back = useCallback(() => {
-    setActivePanel(History.back());
-  }, []);
+    setActivePanel(History.back())
+  }, [])
 
   useEffect(() => {
-    Store.Filters.country.id && Store.Filters.getCities(text);
-  }, [Store.Filters, text]);
+    Store.Filters.country.id && Store.Filters.getCities(text)
+  }, [Store.Filters, text])
 
   const onCloseModal = useCallback(() => {
-    setActiveModal(null);
-  }, []);
+    setActiveModal(null)
+  }, [])
 
   const onActiveModalFilters = useCallback(() => {
-    setActiveModal(MODAL_PAGE_FILTERS);
-  }, []);
+    setActiveModal(MODAL_PAGE_FILTERS)
+  }, [])
 
   const onActiveModalSelectCountry = useCallback(() => {
-    setActiveModal(MODAL_PAGE_SELECT_COUNTRY);
-  }, []);
+    setActiveModal(MODAL_PAGE_SELECT_COUNTRY)
+  }, [])
 
   const onActiveModalSelectCity = useCallback(() => {
-    Store.Filters.country.id && setActiveModal(MODAL_PAGE_SELECT_CITY);
-  }, [Store.Filters.country]);
+    Store.Filters.country.id && setActiveModal(MODAL_PAGE_SELECT_CITY)
+  }, [Store.Filters.country])
 
   const onActiveModalDetails = useCallback(() => {
-    setActiveModal(MODAL_PAGE_DETAILS);
-  }, []);
+    setActiveModal(MODAL_PAGE_DETAILS)
+  }, [])
 
   const onClickCountry = useCallback(
     (country) => {
-      Store.Filters.setCountry(country);
-      Store.Filters.getCities();
-      setActiveModal(MODAL_PAGE_FILTERS);
+      Store.Filters.setCountry(country)
+      Store.Filters.getCities()
+      setActiveModal(MODAL_PAGE_FILTERS)
     },
     [Store.Filters]
-  );
+  )
 
   const onClickCity = useCallback(
     (city) => {
-      Store.Filters.setCity(city);
-      setText('');
-      setActiveModal(MODAL_PAGE_FILTERS);
+      Store.Filters.setCity(city)
+      setText('')
+      setActiveModal(MODAL_PAGE_FILTERS)
     },
     [Store.Filters]
-  );
+  )
 
   const onSwitchSex = useCallback(
     (value) => {
-      Store.Filters.setSex(value);
+      Store.Filters.setSex(value)
     },
     [Store.Filters]
-  );
+  )
 
   const onClickFilters = useCallback(() => {
-    onActiveModalFilters();
-    Store.Filters.listCountries.length === 0 && Store.Filters.getCountries();
-  }, [Store.Filters, onActiveModalFilters]);
+    onActiveModalFilters()
+    Store.Filters.listCountries.length === 0 && Store.Filters.getCountries()
+  }, [Store.Filters, onActiveModalFilters])
 
   const onRefreshFilters = useCallback(() => {
-    Store.Filters.filterClear();
-  }, [Store.Filters]);
+    Store.Filters.filterClear()
+  }, [Store.Filters])
 
   const onChangeSliderAge = useCallback(
     (value) => {
-      if (debouncedSetAge.current) clearTimeout(debouncedSetAge.current);
+      if (debouncedSetAge.current) clearTimeout(debouncedSetAge.current)
       debouncedSetAge.current = setTimeout(() => {
-        Store.Filters.setAge_from(value[0]);
-        Store.Filters.setAge_to(value[1]);
-      }, 250);
-      setAgeSlider({ age_from: value[0], age_to: value[1] });
+        Store.Filters.setAge_from(value[0])
+        Store.Filters.setAge_to(value[1])
+      }, 250)
+      setAgeSlider({ age_from: value[0], age_to: value[1] })
     },
     [Store.Filters]
-  );
+  )
 
   const modal = (
     <ModalRoot activeModal={activeModal}>
@@ -257,8 +257,8 @@ const Find = observer(({ id }) => {
         <Details user={Store.Target.user} />
       </ModalPage>
     </ModalRoot>
-  );
-  const go = useMemo(() => ({ forward, back }), [back, forward]);
+  )
+  const go = useMemo(() => ({ forward, back }), [back, forward])
   return (
     <View id={id} activePanel={activePanel} modal={modal} popout={popout}>
       <MainPanel id={PANEL_MAIN} go={go} />
@@ -267,7 +267,7 @@ const Find = observer(({ id }) => {
       <FeedbackPanel id={PANEL_FEEDBACK} go={go} />
       <CommentPanel id={PANEL_COMMENT} go={go} />
     </View>
-  );
-});
+  )
+})
 
-export default Find;
+export default Find

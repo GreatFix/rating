@@ -1,8 +1,8 @@
-import React from 'react';
-import { Group, Placeholder, PanelSpinner } from '@vkontakte/vkui';
-import { observer } from 'mobx-react-lite';
+import React from 'react'
+import { Group, Placeholder, PanelSpinner } from '@vkontakte/vkui'
+import { observer } from 'mobx-react-lite'
 
-import CustomList from '../CustomList/CustomList';
+import CustomList from '../CustomList/CustomList'
 const GroupWithList = observer(({ object, altHeader, icon, cellType, onClick }) => (
   <Group>
     {object.fetching && object.list.length === 0 ? (
@@ -15,6 +15,6 @@ const GroupWithList = observer(({ object, altHeader, icon, cellType, onClick }) 
       </Placeholder>
     )}
   </Group>
-));
+))
 
-export default GroupWithList;
+export default GroupWithList
