@@ -1,7 +1,0 @@
-.GroupReviews {
-  display: flex;
-}
-.GroupReviewsCounterPositive {
-  background-color: var(--button_commerce_background);
-  margin-right: 5px;
-}

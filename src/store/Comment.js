@@ -11,7 +11,7 @@ export default class Comment {
   images = []
   validateError = ''
   sending = false
-  ready = false
+  isCompleted = false
   type = CREATE_COMMENT
   commentID = null
   constructor(rootStore) {
@@ -41,7 +41,7 @@ export default class Comment {
     this.type = type
     this.validateError = ''
     this.sending = false
-    this.ready = false
+    this.isCompleted = false
     this.commentID = commentID
   }
   clear() {
@@ -53,12 +53,15 @@ export default class Comment {
     this.type = CREATE_COMMENT
     this.validateError = ''
     this.sending = false
-    this.ready = false
+    this.isCompleted = false
     this.commentID = null
   }
 
+  async completed() {
+    return await when(() => this.isCompleted)
+  }
+
   async request() {
-    await when(() => this.ready)
     try {
       let result
       if (this.greetingName !== this.content.substring(0, this.greetingName.length)) {
@@ -84,6 +87,7 @@ export default class Comment {
       }
 
       this.setSending(false)
+      this.setIsCompleted(true)
       return result
     } catch (err) {
       console.error(err)
@@ -115,8 +119,8 @@ export default class Comment {
   setSending(sending) {
     this.sending = sending
   }
-  setReady(ready) {
-    this.ready = ready
+  setIsCompleted(isCompleted) {
+    this.isCompleted = isCompleted
   }
 
   async createComment(feedbackId, content, images, greetingID = null, greetingName = '') {

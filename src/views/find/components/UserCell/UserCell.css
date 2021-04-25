@@ -1,7 +1,0 @@
-.UserReviews {
-  display: flex;
-}
-.UserReviewsCounterPositive {
-  background-color: var(--button_commerce_background);
-  margin-right: 5px;
-}

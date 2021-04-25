@@ -14,8 +14,26 @@ class BACKEND_API {
   async GET_TARGET(config = {}) {
     return await AXIOS.get('/target', config)
   }
+  async GET_FEEDBACK(config = {}) {
+    return await AXIOS.get('/feedback', config)
+  }
+  async GET_COMMENT(config = {}) {
+    return await AXIOS.get('/comment', config)
+  }
   async GET_TARGETS(config = {}) {
     return await AXIOS.get('/targets', config)
+  }
+  async GET_RECENT_FEEDBACKS(config = {}) {
+    return await AXIOS.get('/recent/feedbacks', config)
+  }
+  async GET_RECENT_COMMENTS(config = {}) {
+    return await AXIOS.get('/recent/comments', config)
+  }
+  async GET_TOP_TARGETS(count) {
+    return await AXIOS.get(`/targets/top/${count}`)
+  }
+  async GET_TOP_USERS(count) {
+    return await AXIOS.get(`/users/top/${count}`)
   }
   async POST_AUTH(data = {}, config = {}) {
     return await AXIOS.post('/auth', data, config)

@@ -20,6 +20,33 @@ class BRIDGE_API {
     })
   }
 
+  async SHOW_IMAGES(images = [], start_index = 0) {
+    return await bridge.send('VKWebAppShowImages', { images, start_index })
+  }
+
+  async APP_CLOSE(status = 'success') {
+    return await bridge.send('VKWebAppClose', { status })
+  }
+  async ENABLE_SWIPE() {
+    return await bridge.send('VKWebAppEnableSwipeBack')
+  }
+
+  async DISABLE_SWIPE() {
+    return await bridge.send('VKWebAppDisableSwipeBack')
+  }
+
+  async TAPTIC_IMPACT(style = 'heavy') {
+    return await bridge.send('VKWebAppTapticImpactOccurred', { style })
+  }
+
+  async TAPTIC_NOTIFICATION(type = 'error') {
+    return await bridge.send('VKWebAppDisableSwipeBack', { type })
+  }
+
+  async TAPTIC_SELECTION() {
+    return await bridge.send('VKWebAppDisableSwipeBack')
+  }
+
   async GET_FRIENDS(params = {}) {
     if (!SCOPE.includes('friends')) return new Error("Don't permission")
     return await bridge.send(API_METHOD, {
@@ -28,16 +55,24 @@ class BRIDGE_API {
     })
   }
 
-  async GET_GROUPS(params = {}) {
+  async GET_USER_GROUPS(params = {}) {
     if (!SCOPE.includes('groups')) return new Error("Don't permission")
     return await bridge.send(API_METHOD, {
       method: 'groups.get',
       params: setV(params),
     })
   }
+
   async GET_USERS(params = {}) {
     return await bridge.send(API_METHOD, {
       method: 'users.get',
+      params: setV(params),
+    })
+  }
+
+  async GET_GROUPS(params = {}) {
+    return await bridge.send(API_METHOD, {
+      method: 'groups.getById',
       params: setV(params),
     })
   }

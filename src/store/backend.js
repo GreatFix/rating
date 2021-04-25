@@ -6,7 +6,7 @@ const USER = 'user'
 
 export default class Backend {
   user = { fetching: false, error: null, data: null }
-
+  authorized = false
   constructor(rootStore) {
     makeAutoObservable(this, { getUser: false, getTarget: false, getTargets: false })
     this.rootStore = rootStore
@@ -32,6 +32,10 @@ export default class Backend {
     this[name].fetching = false
   }
 
+  setAuthorized(authorized) {
+    this.authorized = authorized
+  }
+
   async backendAuth() {
     const { stringParams, sign } = getQueryParams()
     const data = {
@@ -41,7 +45,8 @@ export default class Backend {
     }
     try {
       const result = await BACKEND_API.POST_AUTH(data)
-      BACKEND_API.SET_TOKEN(result.data.token)
+      BACKEND_API.SET_TOKEN(result.data)
+      this.setAuthorized(true)
     } catch (err) {
       toErrorLog(err)
     }
@@ -56,7 +61,7 @@ export default class Backend {
     try {
       this.setFetching(USER)
       const result = await BACKEND_API.GET_USER(config)
-      this.setFetchedData(USER, result.data.user)
+      this.setFetchedData(USER, result.data)
     } catch (err) {
       this.setErrorFetch(USER, err)
     }

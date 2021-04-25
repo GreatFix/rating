@@ -39,7 +39,7 @@ export default class Find {
     }
     try {
       const result = await BACKEND_API.GET_TARGETS(config)
-      this.addBackendData(result.data.targets, name)
+      this.addBackendData(result.data, name)
     } catch (err) {
       console.error(err)
     }
@@ -63,7 +63,7 @@ export default class Find {
         const params = {
           count,
           offset,
-          fields: 'id,nickname,domain,photo_50,city,activities',
+          fields: 'id,nickname,domain,photo_50,city,last_seen',
         }
         const result = await BRIDGE_API.GET_FRIENDS(params)
         if (offset > 0) {
@@ -89,7 +89,7 @@ export default class Find {
           offset,
           fields: 'id,members_count,photo_50',
         }
-        const result = await BRIDGE_API.GET_GROUPS(params)
+        const result = await BRIDGE_API.GET_USER_GROUPS(params)
         if (offset > 0) {
           if (offset > result.response.count) return
           this.setFetchedList(GROUPS, this.groups.list.concat(result.response.items))
@@ -115,7 +115,7 @@ export default class Find {
         age_to: filters.age_to,
         count,
         offset,
-        fields: 'id,nickname,domain,photo_50,city,activities',
+        fields: 'id,nickname,domain,photo_50,city,last_seen',
       }
       const result = await BRIDGE_API.SEARCH_USERS(params)
       if (offset > 0) {

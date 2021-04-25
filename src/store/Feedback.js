@@ -9,7 +9,7 @@ export default class Feedback {
   uploadServer = null
   validateError = ''
   sending = false
-  ready = false
+  isCompleted = false
   type = CREATE_FEEDBACK
   feedbackID = null
   constructor(rootStore) {
@@ -24,6 +24,11 @@ export default class Feedback {
   get targetID() {
     return this.rootStore.Target.id
   }
+
+  get targetType() {
+    return this.rootStore.Target.type
+  }
+
   init({ feedbackID = null, conclusion = '', content = '', images = [], type = CREATE_FEEDBACK }) {
     this.conclusion = conclusion
     this.content = content
@@ -31,7 +36,7 @@ export default class Feedback {
     this.type = type
     this.validateError = ''
     this.sending = false
-    this.ready = false
+    this.isCompleted = false
     this.feedbackID = feedbackID
   }
   clear() {
@@ -41,19 +46,23 @@ export default class Feedback {
     this.type = CREATE_FEEDBACK
     this.validateError = ''
     this.sending = false
-    this.ready = false
+    this.isCompleted = false
     this.feedbackID = null
   }
 
+  async completed() {
+    return await when(() => this.isCompleted)
+  }
+
   async request() {
-    await when(() => this.ready)
     try {
       let result
       if (this.type === CREATE_FEEDBACK)
-        result = await this.createFeedback(this.targetID, this.content, this.conclusion, this.images)
+        result = await this.createFeedback(this.targetID, this.targetType, this.content, this.conclusion, this.images)
       else result = await this.updateFeedback(this.feedbackID, this.content, this.conclusion, this.images)
 
       this.setSending(false)
+      this.setIsCompleted(true)
       return result
     } catch (err) {
       console.error(err)
@@ -80,17 +89,18 @@ export default class Feedback {
   setSending(sending) {
     this.sending = sending
   }
-  setReady(ready) {
-    this.ready = ready
+  setIsCompleted(isCompleted) {
+    this.isCompleted = isCompleted
   }
 
-  async createFeedback(targetID, content, conclusion, images) {
+  async createFeedback(targetID, targetType, content, conclusion, images) {
     const config = {
       params: {
         userID: this.userID,
       },
     }
     const data = {
+      targetType,
       targetID,
       content,
       conclusion,

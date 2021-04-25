@@ -1,0 +1,16 @@
+
+.CountFeedbackTypes{
+  display: flex;
+  gap: 5px;
+}
+.CounterPositive {
+  background-color: var(--button_commerce_background);
+  display: grid;
+  justify-content: center;
+  align-items: center;
+} 
+.CounterNegative {
+  display: grid;
+  justify-content: center;
+  align-items: center;
+} 

@@ -6,6 +6,39 @@ body {
 ::-webkit-scrollbar {
   width: 0;
 }
-.Overflow {
+.Overflow-custom {
   overflow: scroll;
+}
+
+ /* Включаем Скролл модальных страниц для descktop'a  */
+  .vkuiModalRoot__modal--collapsed .vkuiModalPage__content, .vkuiModalRoot__modal--dragging .vkuiModalPage__content {
+    overflow: auto !important;
+    
+  }
+ 
+/* Рейтинг пользователя и сообщества в поиске */
+.Popular-custom {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+/* Стили Градиент  */
+.Gradient-custom{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 32px;
+}
+.Title-custom {
+  margin-bottom: 8px;
+  margin-top: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.HeaderWithCounter-custom {
+  display: flex;
+  align-items: center;
 }

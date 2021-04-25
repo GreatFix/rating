@@ -1,12 +1,15 @@
-import { makeAutoObservable } from 'mobx'
+import { makeAutoObservable, when } from 'mobx'
 import BRIDGE_API from '../API/bridge'
 import BACKEND_API from '../API/backend'
 const USER = 'user'
+const GROUP = 'group'
 const FEEDBACKS = 'feedbacks'
 
 export default class Target {
   id = null
+  type = null
   user = { fetching: false, error: null, data: null }
+  group = { fetching: false, error: null, data: null }
   feedbacks = { fetching: false, error: null, data: null }
   reply = false
   constructor(rootStore) {
@@ -15,15 +18,25 @@ export default class Target {
   }
 
   get title() {
-    return `${this.user?.data?.first_name} ${this.user?.data?.last_name}`
+    if (this.type === USER) return `${this.user?.data?.first_name} ${this.user?.data?.last_name}`
+    if (this.type === GROUP) return `${this.user?.data?.name}`
+    return 'Anonim'
   }
 
   get isReviewed() {
     return this.feedbacks.data?.Feedbacks?.some((feedback) => feedback.UserId === this.rootStore.User.userID) ?? false
   }
 
+  get isMyself() {
+    return this.id === this.rootStore.User.userID
+  }
+
   popFeedback(feedbackId) {
+    const feedback = this.feedbacks.data?.Feedbacks?.find((feedback) => feedback.id === feedbackId)
     this.feedbacks.data.Feedbacks = this.feedbacks.data?.Feedbacks?.filter((feedback) => feedback.id !== feedbackId)
+    feedback.conclusion === 'positive'
+      ? this.feedbacks.data.countPositiveFeedbacks--
+      : this.feedbacks.data.countNegativeFeedbacks--
   }
 
   popComment(commentId, feedbackIndex) {
@@ -52,10 +65,33 @@ export default class Target {
   setId(id) {
     this.id = id
   }
+  setType(type) {
+    this.type = type
+  }
+
+  sendedComment() {
+    this.getInfo()
+  }
 
   getInfo() {
-    this.getUser()
+    this.type === USER && this.getUser()
+    this.type === GROUP && this.getGroup()
     this.getFeedbacks()
+  }
+
+  async getGroup() {
+    this.setFetching(GROUP)
+    try {
+      let params = {
+        group_id: String(this.id),
+        fields: 'domain,photo_100,city,members_count,counters',
+      }
+      const result_1 = await BRIDGE_API.GET_GROUPS(params)
+
+      this.setFetchedData(GROUP, result_1?.response[0])
+    } catch (error) {
+      this.setErrorFetch(GROUP, error)
+    }
   }
 
   async getUser() {
@@ -86,49 +122,48 @@ export default class Target {
 
   async getFeedbacks() {
     this.setFetching(FEEDBACKS)
-    let targetFeedbacks, authorsInfo
+    await when(() => this.rootStore.Backend.authorized)
     try {
       const config = {
         params: {
           targetID: this.id,
         },
       }
-      const result = await BACKEND_API.GET_TARGET(config)
+      const target = await (await BACKEND_API.GET_TARGET(config)).data // Инфо о цели с backend
 
-      targetFeedbacks = result?.data?.target
-      let userIds = []
-      targetFeedbacks?.Feedbacks?.forEach((feedback) => {
-        userIds.push(feedback.UserId)
-        feedback.Comments.forEach((comment) => userIds.push(comment.UserId))
+      const AuthorsIds = []
+      target.Feedbacks.forEach((feedback) => {
+        AuthorsIds.push(feedback.UserId)
+        feedback.Comments.forEach((comment) => AuthorsIds.push(comment.UserId))
       })
-      let userIdsString = userIds.join(',')
+
       const params = {
-        user_ids: userIdsString,
+        user_ids: AuthorsIds.join(','),
         fields: 'photo_50',
       }
-      authorsInfo = await (await BRIDGE_API.GET_USERS(params)).response
+      const AuthorsInfo = await (await BRIDGE_API.GET_USERS(params)).response // Данные о авторах отзывов и комментариев с bridge
 
-      //Добавляем отзывам и комментариям данные их авторов
-      targetFeedbacks.Feedbacks = targetFeedbacks.Feedbacks.map((feedback) => {
-        feedback.Comments = feedback.Comments.map((comment) => ({
-          ...authorsInfo.find((user) => user.id === comment.UserId),
-          ...comment,
-        }))
-        return (feedback = { ...authorsInfo.find((user) => user.id === feedback.UserId), ...feedback })
+      const Authors = {}
+      AuthorsInfo.forEach((item) => {
+        Authors[item.id] = item
       })
 
-      targetFeedbacks = { ...targetFeedbacks, Feedbacks: targetFeedbacks.Feedbacks }
+      target.Feedbacks.forEach((feedback, i) => {
+        target.Feedbacks[i] = { ...Authors[feedback.UserId], ...target.Feedbacks[i] }
+        target.Feedbacks[i].Comments = feedback.Comments.map((comment) => ({
+          ...Authors[comment.UserId],
+          ...comment,
+        }))
+      })
+      this.setFetchedData(FEEDBACKS, target)
     } catch (error) {
       this.setErrorFetch(FEEDBACKS, error)
     }
-
-    this.setFetchedData(FEEDBACKS, {
-      ...targetFeedbacks,
-    })
   }
 
   TargetClear() {
     this.user = { fetching: false, error: null, data: null }
+    this.group = { fetching: false, error: null, data: null }
     this.feedbacks = { fetching: false, error: null, data: null }
   }
 }
