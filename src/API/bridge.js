@@ -118,6 +118,14 @@ class BRIDGE_API {
       params: setV(params),
     })
   }
+
+  async STORAGE_SET(params = {}) {
+    return await bridge.send('VKWebAppStorageSet', params)
+  }
+
+  async STORAGE_GET(params = {}) {
+    return await bridge.send('VKWebAppStorageGet', params)
+  }
 }
 
 export default new BRIDGE_API()

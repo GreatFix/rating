@@ -1,5 +1,4 @@
 import { makeAutoObservable, when } from 'mobx'
-
 import BRIDGE_API from '../API/bridge'
 
 export default class User {
@@ -13,11 +12,13 @@ export default class User {
   constructor(rootStore) {
     makeAutoObservable(this)
     this.rootStore = rootStore
-    this.permissions = window.location.search.slice(26).split('&')[0]
-
+    this.permissions = ''
     when(
       () => true,
-      () => this.getUserToken('photos, groups, friends')
+      async () => {
+        const scopeFromStorage = (await (await BRIDGE_API.STORAGE_GET({ keys: ['scope'] })).keys[0].value) ?? ''
+        this.getUserToken(scopeFromStorage)
+      }
     )
     when(
       () => !this.userID,
@@ -58,6 +59,7 @@ export default class User {
     try {
       const result = await BRIDGE_API.GET_AUTH_TOKEN(scope)
       BRIDGE_API.SET_TOKEN(result.access_token, result.scope)
+      BRIDGE_API.STORAGE_SET({ key: 'scope', value: this.permissions + ',' + result.scope })
       this.setToken(result.access_token)
       this.setPermissons(this.permissions + ',' + result.scope)
     } catch (err) {
