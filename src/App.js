@@ -14,7 +14,7 @@ const INTERESTING = 'INTERESTING'
 const PROFILE = 'PROFILE'
 
 const App = observer(() => {
-  const [activeStory, setActiveStory] = useState(INTERESTING)
+  const [activeStory, setActiveStory] = useState(PROFILE)
 
   useEffect(() => {
     bridge.subscribe(({ detail: { type, data } }) => {

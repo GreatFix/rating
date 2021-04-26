@@ -3,6 +3,7 @@ import BRIDGE_API from '../API/bridge'
 
 export default class User {
   userID = null
+  init = false
   access_token = null
   permissions = ''
   firstName = null
@@ -14,20 +15,23 @@ export default class User {
     this.rootStore = rootStore
     this.permissions = ''
     when(
-      () => true,
+      () => this.init,
       async () => {
         const scopeFromStorage = (await (await BRIDGE_API.STORAGE_GET({ keys: ['scope'] })).keys[0].value) ?? ''
         this.getUserToken(scopeFromStorage)
       }
     )
     when(
-      () => !this.userID,
+      () => !this.userID && this.init,
       () => {
         this.getUserInfo()
       }
     )
   }
 
+  setInit(init) {
+    this.init = init
+  }
   setUserInfo(res) {
     this.userID = res.id
     this.firstName = res.first_name
@@ -57,9 +61,12 @@ export default class User {
 
   async getUserToken(scope = '') {
     try {
+      console.log(scope)
       const result = await BRIDGE_API.GET_AUTH_TOKEN(scope)
       BRIDGE_API.SET_TOKEN(result.access_token, result.scope)
-      BRIDGE_API.STORAGE_SET({ key: 'scope', value: this.permissions + ',' + result.scope })
+
+      BRIDGE_API.STORAGE_SET({ key: 'scope', value: result.scope })
+
       this.setToken(result.access_token)
       this.setPermissons(this.permissions + ',' + result.scope)
     } catch (err) {

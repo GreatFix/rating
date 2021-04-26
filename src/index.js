@@ -4,10 +4,11 @@ import bridge from '@vkontakte/vk-bridge'
 import App from './App'
 import { StoreContext, Store } from './store/store'
 // Init VK  Mini App
-bridge.send('VKWebAppInit')
+const store = new Store()
+bridge.send('VKWebAppInit').then((res) => store.User.setInit(res.result))
 
 ReactDOM.render(
-  <StoreContext.Provider value={new Store()}>
+  <StoreContext.Provider value={store}>
     <App />
   </StoreContext.Provider>,
   document.getElementById('root')
